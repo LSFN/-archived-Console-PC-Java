@@ -8,6 +8,7 @@ class files go, it is recommended you don't.
 
 SOURCE_DIRECTORY = 'src/'
 BUILD_DIRECTORY = 'build/'
+OUTPUT_JAR_FILENAME = 'console-pc.jar'
 
 # Scons has a concept of a build 'environment', so this is needed:
 env = Environment()
@@ -18,7 +19,10 @@ make_build_directory = env.Command(BUILD_DIRECTORY,
 								   Mkdir(BUILD_DIRECTORY))
 
 # task for actually doing the java build:
-java_build = env.Java(BUILD_DIRECTORY, SOURCE_DIRECTORY)
+java_build = env.Java(target = BUILD_DIRECTORY, source = SOURCE_DIRECTORY)
 
-# Tell scons that the default action is to do the java build:
-env.Default(java_build) 
+# task for producing console-pc.jar:
+jar_build = env.Jar(target = OUTPUT_JAR_FILENAME, source = SOURCE_DIRECTORY)
+
+# Tell scons that the default action is to do the jar build:
+env.Default(jar_build)
