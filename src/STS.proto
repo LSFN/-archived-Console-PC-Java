@@ -1,0 +1,33 @@
+message STSup {
+	message Lobby {
+		enum ConnectionCommand {
+			CONNECT = 0;
+			DISCONNECT = 1;			
+		}
+	
+		message Connection {
+			optional ConnectionCommand connectionCommand = 1;
+			optional String host = 2;
+			optional uint32 port = 3;
+		}
+	
+		optional bool readyState = 1;
+		optional Connection connection = 2;
+	}
+	
+	message RCon {
+		optional string command = 1;
+	}
+	
+	optional Lobby lobby = 1;
+	optional RCon rcon = 2;
+}
+
+message STSdown {
+	// The reset message would ideally just be a tag, but protocol buffers don't seem to do this.
+	message Reset {
+		optional uint32 reset = 1;
+	}
+
+	optional Reset = 1;
+}
