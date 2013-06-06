@@ -24,5 +24,8 @@ java_build = env.Java(target = BUILD_DIRECTORY, source = SOURCE_DIRECTORY)
 # task for producing console-pc.jar:
 jar_build = env.Jar(target = OUTPUT_JAR_FILENAME, source = SOURCE_DIRECTORY)
 
+# Tell scons that one must build the java files before JARing them:
+env.Depends(jar_build, java_build)
+
 # Tell scons that the default action is to do the jar build:
 env.Default(jar_build)
