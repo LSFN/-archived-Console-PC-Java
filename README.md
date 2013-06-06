@@ -7,8 +7,8 @@ Building using Scons
 ====================
 
 To build using Scons, download and install:  
-*	[Python 2.6+](www.python.org)
-*	[Scons 2.2+](www.scons.org)
+*	[Python 2.6+](http://www.python.org)
+*	[Scons 2.2+](http://www.scons.org)
 
 This assumes you already have a Java compiler and runtime etc installed.
 
