@@ -1,4 +1,4 @@
-package console_pc;
+package org.lsfn.console_pc;
 
 public class ConsolePC {
 
