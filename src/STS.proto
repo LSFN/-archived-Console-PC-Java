@@ -7,7 +7,7 @@ message STSup {
 	
 		message Connection {
 			optional ConnectionCommand connectionCommand = 1;
-			optional String host = 2;
+			optional string host = 2;
 			optional uint32 port = 3;
 		}
 	
@@ -29,5 +29,5 @@ message STSdown {
 		optional uint32 reset = 1;
 	}
 
-	optional Reset = 1;
+	optional Reset reset = 1;
 }
