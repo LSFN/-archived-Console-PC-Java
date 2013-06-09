@@ -7,7 +7,7 @@
 
 # Scons build database #
 *sconsign*
-*.pyc # because of custom tool
+*.pyc
 
 # Build directory #
 /build
