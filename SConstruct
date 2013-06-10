@@ -18,7 +18,7 @@ OUTPUT_JAR_FILENAME = 'console-pc.jar'
 
 # Protocol buffer:
 PROTO_FILES = ['src/STS.proto']
-PROTO_SOURCE_DIRECTORY = 'src/'
+PROTO_OUTPUT_DIRECTORY = 'src/'
 
 # Scons has a concept of a build 'environment', so this is needed:
 # The two parameters tell it to load the default tools, as well as protoc
@@ -27,7 +27,7 @@ env = Environment(tools = ['default', 'protoc'], toolpath = '.')
 
 # protoc build (setting the output to be in PROTO_SOURCE_DIRECTORY):
 protoc_files = env.ProtocJava(source = PROTO_FILES,
-							  PROTOCJAVAOUTDIR = PROTO_SOURCE_DIRECTORY)
+							  PROTOCJAVAOUTDIR = PROTO_OUTPUT_DIRECTORY)
 
 # task for actually doing the java build:
 env.Append(JAVACLASSPATH = LIB_DIRECTORY_CONTENTS) # add lib to the classpath
