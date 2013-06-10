@@ -18,7 +18,7 @@ OUTPUT_JAR_FILENAME = 'console-pc.jar'
 
 # Protocol buffer:
 PROTO_FILES = ['src/STS.proto']
-PROTO_OUTPUT_DIRECTORY = 'src/'
+PROTO_OUTPUT_DIRECTORY = 'src/org/lsfn/console_pc/'
 
 # Scons has a concept of a build 'environment', so this is needed:
 # The two parameters tell it to load the default tools, as well as protoc
