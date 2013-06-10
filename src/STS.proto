@@ -1,3 +1,5 @@
+option java_package = "org.lsfn.console_pc";
+
 message STSup {
 	message Lobby {
 		enum ConnectionCommand {
