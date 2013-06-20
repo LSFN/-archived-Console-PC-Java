@@ -96,8 +96,8 @@ public class Networking extends Thread {
      * Adds a message received from the Starship to the buffer.
      * @param downmessage The message received.
      */
-    private synchronized void addMessageToBuffer(STSdown downmessage) {
-        this.starshipMessages.add(downmessage);
+    private synchronized void addMessageToBuffer(STSdown downMessage) {
+        this.starshipMessages.add(downMessage);
     }
     
     /**
@@ -131,6 +131,7 @@ public class Networking extends Thread {
                 this.starshipInput = new BufferedInputStream(starshipSocket.getInputStream());
                 this.starshipOutput = new BufferedOutputStream(starshipSocket.getOutputStream());
                 this.starshipMessages = new ArrayList<STSdown>();
+                System.out.println("Connected to Starship at " + this.starshipSocket.getInetAddress().getHostAddress());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -177,6 +178,7 @@ public class Networking extends Thread {
                 this.starshipMessages = null;
             }
         }
+        System.out.println("Disconnected");
     }
 
 }

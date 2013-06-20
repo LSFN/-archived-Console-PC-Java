@@ -17,6 +17,7 @@ public class ConsolePC {
     private void startNetwork(String host, int port) {
         this.network = new Networking();
         this.network.setStarshipAddress(host, port);
+        this.network.connect();
         this.network.run();
     }
     
