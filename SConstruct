@@ -9,6 +9,7 @@ class files go, it is recommended you don't.
 # Program level constants
 SOURCE_DIRECTORY = 'src/'
 BUILD_DIRECTORY = 'build/'
+TL_PACKAGE_DIRECTORY = 'org/'
 LIB_DIRECTORY = 'lib/'
 # By default, scons' Glob() function returns Scons nodes
 # but as we need filenames, have to use this list comprehension.
@@ -35,7 +36,7 @@ java_build = env.Java(target = BUILD_DIRECTORY, source = SOURCE_DIRECTORY)
 
 # task for producing console-pc.jar:
 jar_build = env.Jar(target = OUTPUT_JAR_FILENAME, 
-					source = [BUILD_DIRECTORY, LIB_DIRECTORY])
+					source = [BUILD_DIRECTORY, LIB_DIRECTORY, "Manifest.txt"])
 
 # Tell scons that one must build the java files before JARing them:
 env.Depends(jar_build, java_build)

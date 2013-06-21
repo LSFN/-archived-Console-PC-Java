@@ -21,6 +21,13 @@ public class ConsolePC {
         this.network.run();
     }
     
+    private void printHelp() {
+        System.out.println("Console-PC:");
+        System.out.println("\thelp   : print this help text.");
+        System.out.println("\tconnect <host> <port> : connects to the server on the given host and port.");
+        System.out.println("\texit   : end this program.");
+    }
+    
     private void processCommand(String commandStr) {
         String[] commandParts = commandStr.split(" ");
          
@@ -28,6 +35,8 @@ public class ConsolePC {
             startNetwork(commandParts[1], Integer.parseInt(commandParts[2]));
         } else if(commandParts[0].equals("exit")) {
             this.keepGoing = false;
+        } else if(commandParts[0].equals("help")) {
+            printHelp();
         } else {
             System.out.println("You're spouting gibberish. Please try English.");
         }
