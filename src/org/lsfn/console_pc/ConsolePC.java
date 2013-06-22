@@ -28,7 +28,7 @@ public class ConsolePC {
     }
     
     private void printHelp() {
-        System.out.println("Console-PC:");
+        System.out.println("Console-PC commands:");
         System.out.println("\thelp   : print this help text.");
         System.out.println("\tconnect <host> <port> : connects to the server on the given host and port.");
         System.out.println("\texit   : end this program.");
