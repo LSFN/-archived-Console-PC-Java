@@ -1,3 +1,6 @@
+option java_package = "org.lsfn.console_pc";
+option java_outer_classname = "STS";
+
 message STSup {
 	message Lobby {
 		enum ConnectionCommand {
