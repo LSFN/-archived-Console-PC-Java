@@ -4,21 +4,27 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
+
 public class ConsolePC {
 
-    private Networking network;
+    private StarshipConnection starshipConnection;
     private boolean keepGoing;
     
     public ConsolePC() {
-        this.network = null;
+        this.starshipConnection = null;
         this.keepGoing = true;
     }
     
     private void startNetwork(String host, int port) {
-        this.network = new Networking();
-        this.network.setStarshipAddress(host, port);
-        this.network.connect();
-        this.network.run();
+        this.starshipConnection = new StarshipConnection();
+        ConnectionStatus status = this.starshipConnection.connect(host, port);
+        if(status == ConnectionStatus.CONNECTED) {
+            this.starshipConnection.run();
+            System.out.println("Connected.");
+        } else {
+            System.out.println("Connection failed.");
+        }
     }
     
     private void printHelp() {
@@ -55,10 +61,14 @@ public class ConsolePC {
         }
         
         // Close up the threads
-        if(this.network.isConnected()) {
-            this.network.disconnect();
+        if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+            System.out.println("Disconnecting from Starship...");
+            this.starshipConnection.disconnect();
+        }
+        if(this.starshipConnection.isAlive()) {
             try {
-                this.network.join();
+                System.out.println("Joining listener thread...");
+                this.starshipConnection.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
