@@ -43,6 +43,8 @@ public class ConsolePC {
     }
     
     public void run(String[] args) {
+        printHelp();
+        
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while(this.keepGoing) {
             try {
