@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import subprocess
+
+if __name__ == "__main__":
+	subprocess.call(["protoc", "-I.", "--java_out=src/", "proto_src/STS.proto"])

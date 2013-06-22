@@ -9,7 +9,6 @@ class files go, it is recommended you don't.
 # Program level constants
 SOURCE_DIRECTORY = 'src/'
 BUILD_DIRECTORY = 'build/'
-TL_PACKAGE_DIRECTORY = 'org/'
 LIB_DIRECTORY = 'lib/'
 # By default, scons' Glob() function returns Scons nodes
 # but as we need filenames, have to use this list comprehension.
@@ -17,25 +16,14 @@ LIB_DIRECTORY = 'lib/'
 LIB_DIRECTORY_CONTENTS = [str(s) for s in Glob('lib/*')]
 OUTPUT_JAR_FILENAME = 'console-pc.jar'
 
-# Protocol buffer:
-PROTO_FILES = ['proto_src/org/lsfn/console_pc/STS.proto']
-PROTO_OUTPUT_DIRECTORY = 'proto_build/'
-PROTO_PACKAGE_DIRECTORY = 'org/lsfn/console_pc/'
-
 # Scons has a concept of a build 'environment', so this is needed:
 # The two parameters tell it to load the default tools, as well as protoc
 # protoc.py is located in this directory, so we need to add that to the toolpath
-env = Environment(tools = ['default', 'protoc'], toolpath = '.')
-
-# protoc build (setting the output to be in PROTO_SOURCE_DIRECTORY):
-# Alters the returned file location to include java package directory structure
-# Also a submission to the "Worst one-liners" competition.
-protoc_files = [File(PROTO_OUTPUT_DIRECTORY + PROTO_PACKAGE_DIRECTORY + (str(env.ProtocJava(source = PROTO_FILES, PROTOCJAVAOUTDIR = PROTO_OUTPUT_DIRECTORY)[0]).split("/")[-1]))]
-print [str(x) for x in protoc_files]
+env = Environment()
 
 # task for actually doing the java build:
 env.Append(JAVACLASSPATH = LIB_DIRECTORY_CONTENTS) # add lib to the classpath
-java_build = env.Java(target = BUILD_DIRECTORY, source = [SOURCE_DIRECTORY, PROTO_OUTPUT_DIRECTORY])
+java_build = env.Java(target = BUILD_DIRECTORY, source = [SOURCE_DIRECTORY])
 
 # task for producing console-pc.jar:
 jar_build = env.Jar(target = OUTPUT_JAR_FILENAME, 
@@ -43,9 +31,6 @@ jar_build = env.Jar(target = OUTPUT_JAR_FILENAME,
 
 # Tell scons that one must build the java files before JARing them:
 env.Depends(jar_build, java_build)
-
-# and one must do protoc before building source:
-env.Depends(java_build, protoc_files)
 
 # Tell scons that the default action is to do the jar build:
 env.Default(jar_build)
