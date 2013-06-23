@@ -83,7 +83,6 @@ public class StarshipConnection extends Thread {
         if(this.connectionStatus != ConnectionStatus.CONNECTED) {
             this.host = host;
             this.port = port;
-            
             try {
                 this.starshipSocket = new Socket(this.host, this.port);
                 this.starshipInput = new BufferedInputStream(starshipSocket.getInputStream());
@@ -153,7 +152,7 @@ public class StarshipConnection extends Thread {
                 clearConnection();
             }
             try {
-                this.wait(pollWait);
+                Thread.sleep(pollWait);
             } catch (InterruptedException e) {
                 // An interrupt indicates that something has happened to the connection
                 // This loop will now probably terminate.

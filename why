@@ -1,0 +1,3 @@
+protoc -I. --java_out=src/ proto_src/STS.proto
+javac -classpath lib/protobuf-java-2.5.0.jar -d build -sourcepath src src/org/lsfn/console_pc/ConsolePC.java src/org/lsfn/console_pc/StarshipConnection.java src/org/lsfn/console_pc/STS.java
+jar cfm console-pc.jar Manifest.txt lib -C build .

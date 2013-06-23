@@ -8,6 +8,9 @@ import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 
 public class ConsolePC {
 
+    private static final String defaultHost = "localhost";
+    private static final Integer defaultPort = 39460;
+    
     private StarshipConnection starshipConnection;
     private boolean keepGoing;
     
@@ -18,13 +21,24 @@ public class ConsolePC {
     
     private void startNetwork(String host, int port) {
         this.starshipConnection = new StarshipConnection();
+        System.out.println("Connecting...");
         ConnectionStatus status = this.starshipConnection.connect(host, port);
         if(status == ConnectionStatus.CONNECTED) {
-            this.starshipConnection.run();
+            this.starshipConnection.start();
             System.out.println("Connected.");
         } else {
             System.out.println("Connection failed.");
         }
+    }
+    
+
+    private void stopNetwork() {
+        if(this.starshipConnection != null) {
+            if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+                this.starshipConnection.disconnect();
+            }
+        }
+        System.out.println("Disconnected.");
     }
     
     private void printHelp() {
@@ -38,7 +52,13 @@ public class ConsolePC {
         String[] commandParts = commandStr.split(" ");
          
         if(commandParts[0].equals("connect")) {
-            startNetwork(commandParts[1], Integer.parseInt(commandParts[2]));
+            if(commandParts.length == 3) {
+                startNetwork(commandParts[1], Integer.parseInt(commandParts[2]));
+            } else if(commandParts.length == 1) {
+                startNetwork(defaultHost, defaultPort);
+            }
+        } else if(commandParts[0].equals("disconnect")) {
+            stopNetwork();
         } else if(commandParts[0].equals("exit")) {
             this.keepGoing = false;
         } else if(commandParts[0].equals("help")) {
@@ -47,7 +67,7 @@ public class ConsolePC {
             System.out.println("You're spouting gibberish. Please try English.");
         }
     }
-    
+
     public void run(String[] args) {
         printHelp();
         
@@ -61,16 +81,18 @@ public class ConsolePC {
         }
         
         // Close up the threads
-        if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
-            System.out.println("Disconnecting from Starship...");
-            this.starshipConnection.disconnect();
-        }
-        if(this.starshipConnection.isAlive()) {
-            try {
-                System.out.println("Joining listener thread...");
-                this.starshipConnection.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        if(this.starshipConnection != null) {
+            if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+                System.out.println("Disconnecting from Starship...");
+                this.starshipConnection.disconnect();
+            }
+            if(this.starshipConnection.isAlive()) {
+                try {
+                    System.out.println("Joining listener thread...");
+                    this.starshipConnection.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
