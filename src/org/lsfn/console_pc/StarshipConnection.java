@@ -11,6 +11,8 @@ import org.lsfn.console_pc.STS.*;
 
 public class StarshipConnection extends Thread {
 
+    private static final String defaultHost = "localhost";
+    private static final Integer defaultPort = 39460;
     private static final Integer pollWait = 50;
     
     private Socket starshipSocket;
@@ -95,6 +97,10 @@ public class StarshipConnection extends Thread {
             }
         }
         return this.connectionStatus;
+    }
+    
+    public ConnectionStatus connect() {
+        return this.connect(defaultHost, defaultPort);
     }
     
     /**
