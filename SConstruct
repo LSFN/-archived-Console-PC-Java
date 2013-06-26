@@ -25,7 +25,7 @@ PROTO_FILES = [str(s) for s in Glob(PROTO_SOURCE_DIRECTORY + '/*.proto')]
 # Scons has a concept of a build 'environment', so this is needed:
 # The two parameters tell it to load the default tools, as well as protoc
 # protoc.py is located in this directory, so we need to add that to the toolpath
-env = Environment(tools = ['default', 'protoc'], toolpath = '.')
+env = Environment(tools = ['default', 'protoc'], toolpath = ['tools'])
 
 # protoc build (setting the output to be in PROTO_SOURCE_DIRECTORY):
 protoc_files = env.ProtocJava(source = PROTO_FILES, PROTOCJAVAOUTDIR = PROTO_OUTPUT_DIRECTORY)
