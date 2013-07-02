@@ -33,18 +33,22 @@ env = Environment(tools = ['default', 'protoc'], toolpath = ['tools'])
 protoc_files = env.ProtocJava(source = PROTO_FILES, 
                               PROTOCJAVAOUTDIR = PROTO_OUTPUT_DIRECTORY)
 
+# print [os.path.splitext(os.path.basename(str(x)))[0] for x in protoc_files]
+
 # task for actually doing the java build:
 env.Append(JAVACLASSPATH = LIB_DIRECTORY_CONTENTS) # add lib to the classpath
 CLASS_FILES = java_build = env.Java(target = BUILD_DIRECTORY, 
                                     source = SOURCE_DIRECTORY)
 
 # Tacky fix for a large bug in somewhere in Scons' Java scanner:
-# Check that all the class files that are purported to exist actually do:
+protoc_filenames = [os.path.splitext(os.path.basename(str(x)))[0] for x in protoc_files]
+
 for filenode in CLASS_FILES:
-    if not os.path.exists(str(filenode)):
-        # For some reason, Scons does not correctly determine
-        # that STS.java has the same package as all the other
-        # java source files
+    # get STS from .../STS.java
+    filename = os.path.splitext(os.path.basename(str(filenode)))[0]
+
+    if filename in protoc_filenames:
+        print "Removing", str(filenode), "from CLASS_FILES"
         CLASS_FILES.remove(filenode)
 
 # task for producing console-pc.jar:
