@@ -1,6 +1,7 @@
 package org.lsfn.console_pc;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -9,6 +10,7 @@ import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 public class ConsolePC {
 
     private StarshipConnection starshipConnection;
+    private PilotingDisplay pilotingDisplay;
     private boolean keepGoing;
     
     public ConsolePC() {
@@ -52,6 +54,11 @@ public class ConsolePC {
         System.out.println("\texit                  : end this program.");
     }
     
+    private void startDisplay() {
+        this.pilotingDisplay = new PilotingDisplay(this.starshipConnection);
+        this.pilotingDisplay.start();
+    }
+    
     private void processCommand(String commandStr) {
         String[] commandParts = commandStr.split(" ");
          
@@ -63,6 +70,8 @@ public class ConsolePC {
             }
         } else if(commandParts[0].equals("disconnect")) {
             stopStarshipClient();
+        } else if(commandParts[0].equals("display")) {
+            startDisplay();
         } else if(commandParts[0].equals("exit")) {
             this.keepGoing = false;
         } else if(commandParts[0].equals("help")) {
@@ -105,6 +114,9 @@ public class ConsolePC {
      * @param args
      */
     public static void main(String[] args) {
+        // This line points to the lwjgl natives in the jar 
+        // TODO determine operating system and choose appropriate path 
+        System.setProperty("org.lwjgl.librarypath", new File("native/linux").getAbsolutePath());
         ConsolePC consolePC = new ConsolePC();
         consolePC.run(args);
     }

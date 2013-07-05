@@ -13,6 +13,7 @@ import os.path
 SOURCE_DIRECTORY = 'src/'
 BUILD_DIRECTORY = 'build/'
 LIB_DIRECTORY = 'lib/'
+NATIVE_DIRECTORY = 'native/'
 
 # By default, scons' Glob() function returns Scons nodes
 # but as we need filenames, have to use this list comprehension.
@@ -53,7 +54,7 @@ for filenode in CLASS_FILES:
 
 # task for producing console-pc.jar:
 jar_build = env.Jar(target = OUTPUT_JAR_FILENAME, 
-                    source = CLASS_FILES + [LIB_DIRECTORY, "Manifest.txt"])
+                    source = CLASS_FILES + [LIB_DIRECTORY, NATIVE_DIRECTORY, "Manifest.txt"])
 
 # Tell scons that one must build the java files before JARing them:
 env.Depends(jar_build, java_build)
