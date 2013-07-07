@@ -6,23 +6,27 @@ import org.lsfn.console_pc.STS.STSup;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.PixelFormat;
 
 public class PilotingDisplay extends Thread {
     
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 1024;
+    private static final String WINDOW_TITLE = "LSFN";
     
     private boolean[] keyStates; 
     private boolean[] keyStatesChanged;
     private StarshipConnection starshipConnection;
     
-    private int vaoId, vboId;
+    private int vaoId, vboId, vertexCount;
+    
     
     private enum DisplayState {
         MENU,
@@ -123,33 +127,36 @@ public class PilotingDisplay extends Thread {
         
     }
    
-    private void setupDisplay() {
+    public void setupOpenGL() {
+        // Setup an OpenGL context with API version 3.2
         try {
+            /*
+            PixelFormat pixelFormat = new PixelFormat();
+            ContextAttribs contextAtrributes = new ContextAttribs(3, 2)
+                .withForwardCompatible(true)
+                .withProfileCore(true);
+            */
+            
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
-            Display.setTitle("LSFN");
+            Display.setTitle(WINDOW_TITLE);
             Display.create();
+            
+            GL11.glViewport(0, 0, WIDTH, HEIGHT);
         } catch (LWJGLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.exit(-1);
         }
         
-        // Apparently we do this line twice
-        GL11.glViewport(0, 0, WIDTH, HEIGHT);
         // Setup an XNA like background color
         GL11.glClearColor(0.4f, 0.6f, 0.9f, 0f);
+        
         // Map the internal OpenGL coordinate system to the entire screen
         GL11.glViewport(0, 0, WIDTH, HEIGHT);
+        
+        this.exitOnGLError("Error in setupOpenGL");
     }
     
-    /**
-     * If you don't know what this method does
-     * looking at its name, god help you.
-     */
-    private void drawAllOfTheThings() {
-        // Currently just straight from the lwjgl wiki
-        
-        // DEFINE WHAT WE'RE DRAWING
-        
+    public void setupQuad() {       
         // OpenGL expects vertices to be defined counter clockwise by default
         float[] vertices = {
                 // Left bottom triangle
@@ -165,16 +172,14 @@ public class PilotingDisplay extends Thread {
         FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
         verticesBuffer.put(vertices);
         verticesBuffer.flip();
-
-        int vertexCount = 6;
         
-        // DO CONFUSING MEMORY STUFF
+        vertexCount = 6;
         
         // Create a new Vertex Array Object in memory and select it (bind)
         // A VAO can have up to 16 attributes (VBO's) assigned to it by default
         vaoId = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vaoId);
-
+        
         // Create a new Vertex Buffer Object in memory and select it (bind)
         // A VBO is a collection of Vectors which in this case resemble the location of each vertex.
         vboId = GL15.glGenBuffers();
@@ -184,52 +189,69 @@ public class PilotingDisplay extends Thread {
         GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
         // Deselect (bind to 0) the VBO
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
+        
         // Deselect (bind to 0) the VAO
         GL30.glBindVertexArray(0);
         
-        // ACTUALLY DRAW
-        
+        this.exitOnGLError("Error in setupQuad");
+    }
+    
+    public void loopCycle() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-
+        
         // Bind to the VAO that has all the information about the quad vertices
         GL30.glBindVertexArray(vaoId);
         GL20.glEnableVertexAttribArray(0);
-
+        
         // Draw the vertices
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertexCount);
-
+        
         // Put everything back to default (deselect)
         GL20.glDisableVertexAttribArray(0);
         GL30.glBindVertexArray(0);
         
+        this.exitOnGLError("Error in loopCycle");
     }
     
-    private void cleanupDisplay() {
-        // CLEANUP
-        
+    public void destroyOpenGL() {       
         // Disable the VBO index from the VAO attributes list
         GL20.glDisableVertexAttribArray(0);
-
+        
         // Delete the VBO
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL15.glDeleteBuffers(vboId);
-
+        
         // Delete the VAO
         GL30.glBindVertexArray(0);
         GL30.glDeleteVertexArrays(vaoId);
         
+        Display.destroy();
+    }
+    
+    public void exitOnGLError(String errorMessage) {
+        int errorValue = GL11.glGetError();
+        
+        if (errorValue != GL11.GL_NO_ERROR) {
+            String errorString = "<insert error here>";
+            System.err.println("ERROR - " + errorMessage + ": " + errorString);
+            
+            if (Display.isCreated()) Display.destroy();
+            System.exit(-1);
+        }
     }
     
     @Override
     public void run() {
-        setupDisplay();
-
+        System.out.println("Setting up openGL...");
+        setupOpenGL();
+        System.out.println("Setting up quad...");
+        setupQuad();
+        System.out.println("Looping...");
         while(!Display.isCloseRequested()) {
             
             // Update internal variables from input
-            keyboardInput();
-            mouseInput();
+            //keyboardInput();
+            //mouseInput();
             
             // Send commands to Starship
             //dispatchStarshipMessages();
@@ -238,15 +260,14 @@ public class PilotingDisplay extends Thread {
             //processStarshipData();
             
             // Draw all of the things
-            drawAllOfTheThings();
+            loopCycle();
             
-            // Update display
+            Display.sync(60);
             Display.update();
         }
+        System.out.println("Destroying openGL stuff...");
+        destroyOpenGL();
         
-        cleanupDisplay();
-        
-        Display.destroy();
     }
 
 
