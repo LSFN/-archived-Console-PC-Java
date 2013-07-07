@@ -9,10 +9,12 @@ import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 public class ConsolePC {
 
     private StarshipConnection starshipConnection;
+    private PilotingDisplay pilotingDisplay;
     private boolean keepGoing;
     
     public ConsolePC() {
         this.starshipConnection = null;
+        this.pilotingDisplay = null;
         this.keepGoing = true;
     }
     
@@ -52,6 +54,11 @@ public class ConsolePC {
         System.out.println("\texit                  : end this program.");
     }
     
+    private void startDisplay() {
+        this.pilotingDisplay = new PilotingDisplay(this.starshipConnection);
+        this.pilotingDisplay.start();
+    }
+    
     private void processCommand(String commandStr) {
         String[] commandParts = commandStr.split(" ");
          
@@ -67,6 +74,8 @@ public class ConsolePC {
             this.keepGoing = false;
         } else if(commandParts[0].equals("help")) {
             printHelp();
+        } else if(commandParts[0].equals("display")) {
+            startDisplay();
         } else {
             System.out.println("You're spouting gibberish. Please try English.");
         }
