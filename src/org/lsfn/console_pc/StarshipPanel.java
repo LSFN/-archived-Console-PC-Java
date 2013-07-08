@@ -7,12 +7,8 @@ import java.awt.Rectangle;
 
 import javax.swing.JPanel;
 
-public class PilotingPanel extends JPanel {
-    
-    public PilotingPanel() {
-        
-    }
-    
+public class StarshipPanel extends JPanel {
+
     private void paintCalibration(Graphics g) {
         int squareSize = 10;
         Rectangle bounds = this.getBounds();
@@ -38,4 +34,5 @@ public class PilotingPanel extends JPanel {
     public Dimension getPreferredSize() {
         return new Dimension(1280, 1024);
     }
+    
 }

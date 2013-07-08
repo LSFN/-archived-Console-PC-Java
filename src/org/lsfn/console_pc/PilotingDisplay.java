@@ -25,20 +25,24 @@ public class PilotingDisplay extends JFrame {
         PILOTING
     }
     private DisplayState displayState;
+    private DisplayState nextState;
     
     private Timer timer;
     
+    private TypingKeyAdapter typingKeyAdapter;
+    
     public PilotingDisplay(StarshipConnection starshipConnection) {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.setUndecorated(true);
+        //this.setUndecorated(true);
         this.setSize(WIDTH, HEIGHT);
-        this.add(new PilotingPanel());
+        this.add(new MenuPanel(this));
         this.pack();
         this.setVisible(true);
         this.createBufferStrategy(2);
         
         this.starshipConnection = starshipConnection;
         this.displayState = DisplayState.MENU;
+        this.nextState = DisplayState.MENU;
         this.keyStates = new boolean[6];
         for(int i = 0; i < this.keyStates.length; i++) {
             this.keyStates[i] = false;
@@ -49,6 +53,14 @@ public class PilotingDisplay extends JFrame {
         }
         
         this.timer = new Timer(tickInterval, new Ticker(this));
+        
+        this.setFocusable(true);
+        this.typingKeyAdapter = new TypingKeyAdapter();
+        this.addKeyListener(typingKeyAdapter);
+    }
+    
+    public TypingKeyAdapter getTypingKeyAdapter() {
+        return this.typingKeyAdapter;
     }
     
     private void processInput() {
@@ -105,17 +117,23 @@ public class PilotingDisplay extends JFrame {
         BufferStrategy bs = this.getBufferStrategy();
         Graphics g = bs.getDrawGraphics();
         
+        this.repaint();
         this.paintComponents(g);
         
         g.dispose();
     }
+
     
     public void tick() {
-        drawAllTheThings();
+        this.repaint();
     }
     
     public void start() {
         this.timer.start();
+    }
+    
+    public void stop() {
+        this.timer.stop();
     }
     
     private class Ticker implements ActionListener {

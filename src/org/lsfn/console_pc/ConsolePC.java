@@ -58,6 +58,10 @@ public class ConsolePC {
         this.pilotingDisplay = new PilotingDisplay(this.starshipConnection);
         this.pilotingDisplay.start();
     }
+
+    private void stopDisplay() {
+        this.pilotingDisplay.stop();
+    }
     
     private void processCommand(String commandStr) {
         String[] commandParts = commandStr.split(" ");
@@ -75,7 +79,13 @@ public class ConsolePC {
         } else if(commandParts[0].equals("help")) {
             printHelp();
         } else if(commandParts[0].equals("display")) {
-            startDisplay();
+            if(commandParts[1].equals("start")) {
+                startDisplay();
+            } else if (commandParts[1].equals("stop")){
+                stopDisplay();
+            } else {
+                System.out.println("The display can't do that, try something within the bounds of feasibility.");
+            }
         } else {
             System.out.println("You're spouting gibberish. Please try English.");
         }
