@@ -44,7 +44,6 @@ CLASS_FILES = java_build = env.Java(target = BUILD_DIRECTORY,
 protoc_filenames = [os.path.splitext(os.path.basename(str(x)))[0] for x in protoc_files]
 
 for filenode in CLASS_FILES:
-    # get STS from .../STS.java
     filename = os.path.splitext(os.path.basename(str(filenode)))[0]
 
     if filename in protoc_filenames:

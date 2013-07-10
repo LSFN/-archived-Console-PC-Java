@@ -1,9 +1,11 @@
 package org.lsfn.console_pc;
 
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.lsfn.console_pc.PilotingDisplay.DisplayState;
 import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 
 public class ConsolePC {
@@ -18,7 +20,7 @@ public class ConsolePC {
         this.keepGoing = true;
     }
     
-    private void startStarshipClient(String host, Integer port) {
+    public void startStarshipClient(String host, Integer port) {
         this.starshipConnection = new StarshipConnection();
         System.out.println("Connecting...");
         ConnectionStatus status = ConnectionStatus.DISCONNECTED;
@@ -30,6 +32,7 @@ public class ConsolePC {
         if(status == ConnectionStatus.CONNECTED) {
             this.starshipConnection.start();
             System.out.println("Connected.");
+            this.pilotingDisplay.changeDisplayState(DisplayState.LOBBY);
         } else {
             System.out.println("Connection failed.");
         }
@@ -55,12 +58,13 @@ public class ConsolePC {
     }
     
     private void startDisplay() {
-        this.pilotingDisplay = new PilotingDisplay(this.starshipConnection);
+        this.pilotingDisplay = new PilotingDisplay(this, this.starshipConnection);
         this.pilotingDisplay.start();
     }
 
-    private void stopDisplay() {
+    public void stopDisplay() {
         this.pilotingDisplay.stop();
+        this.pilotingDisplay.dispatchEvent(new WindowEvent(this.pilotingDisplay, WindowEvent.WINDOW_CLOSING));
     }
     
     private void processCommand(String commandStr) {

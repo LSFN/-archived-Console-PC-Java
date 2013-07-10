@@ -16,30 +16,39 @@ public class PilotingDisplay extends JFrame {
     private static final int HEIGHT = 1024;
     private static final int tickInterval = 50;
     
+    private ConsolePC consolePC;
     private StarshipConnection starshipConnection;
     private boolean[] keyStates, keyStatesChanged;
 
     public enum DisplayState{
         MENU,
-        STARSHIP,
+        LOBBY,
         PILOTING
     }
     private DisplayState displayState;
     private DisplayState nextState;
+    private MenuPanel menuPanel;
+    private LobbyPanel lobbyPanel;
+    private PilotingPanel pilotingPanel;
     
     private Timer timer;
     
-    private TypingKeyAdapter typingKeyAdapter;
-    
-    public PilotingDisplay(StarshipConnection starshipConnection) {
+    public PilotingDisplay(ConsolePC consolePC, StarshipConnection starshipConnection) {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.setFocusable(true);
         //this.setUndecorated(true);
         this.setSize(WIDTH, HEIGHT);
-        this.add(new MenuPanel(this));
-        this.pack();
         this.setVisible(true);
         this.createBufferStrategy(2);
         
+        this.pilotingPanel = null;
+        this.lobbyPanel = null;
+        this.menuPanel = new MenuPanel(this);
+        this.add(this.menuPanel);
+        this.addKeyListener(menuPanel);
+        this.pack();
+        
+        this.consolePC = consolePC;
         this.starshipConnection = starshipConnection;
         this.displayState = DisplayState.MENU;
         this.nextState = DisplayState.MENU;
@@ -53,14 +62,45 @@ public class PilotingDisplay extends JFrame {
         }
         
         this.timer = new Timer(tickInterval, new Ticker(this));
-        
-        this.setFocusable(true);
-        this.typingKeyAdapter = new TypingKeyAdapter();
-        this.addKeyListener(typingKeyAdapter);
     }
     
-    public TypingKeyAdapter getTypingKeyAdapter() {
-        return this.typingKeyAdapter;
+    public void changeDisplayState(DisplayState state) {
+        this.nextState = state;
+    }
+    
+    private void displayStateChange() {
+        if(this.nextState != this.displayState) {
+            if(this.displayState == DisplayState.MENU) {
+                this.remove(menuPanel);
+                this.removeKeyListener(menuPanel);
+                this.menuPanel = null;
+            } else if(this.displayState == DisplayState.LOBBY) {
+                this.remove(lobbyPanel);
+                this.removeKeyListener(lobbyPanel);
+                this.lobbyPanel = null;
+            } else if(this.displayState == DisplayState.PILOTING) {
+                this.remove(pilotingPanel);
+                this.removeKeyListener(pilotingPanel);
+                this.pilotingPanel = null;
+            }
+            
+            if(this.nextState == DisplayState.MENU) {
+                this.menuPanel = new MenuPanel(this);
+                this.add(this.menuPanel);
+                this.addKeyListener(menuPanel);
+            } else if(this.nextState == DisplayState.LOBBY) {
+                this.lobbyPanel = new LobbyPanel();
+                this.add(this.lobbyPanel);
+                this.addKeyListener(lobbyPanel);
+            } else if(this.nextState == DisplayState.PILOTING) {
+                this.pilotingPanel = new PilotingPanel();
+                this.add(this.pilotingPanel);
+                this.addKeyListener(this.pilotingPanel);
+            }
+            this.pack();
+            
+            this.displayState = this.nextState;
+        }
     }
     
     private void processInput() {
@@ -113,18 +153,8 @@ public class PilotingDisplay extends JFrame {
         }
     }
     
-    private void drawAllTheThings() {
-        BufferStrategy bs = this.getBufferStrategy();
-        Graphics g = bs.getDrawGraphics();
-        
-        this.repaint();
-        this.paintComponents(g);
-        
-        g.dispose();
-    }
-
-    
     public void tick() {
+        displayStateChange();
         this.repaint();
     }
     
@@ -134,6 +164,12 @@ public class PilotingDisplay extends JFrame {
     
     public void stop() {
         this.timer.stop();
+    }
+    
+    // Horrible functionality exposure hack
+    // TODO make ConsolePC the JFrame
+    public ConsolePC getConsolePC() {
+        return this.consolePC;
     }
     
     private class Ticker implements ActionListener {
