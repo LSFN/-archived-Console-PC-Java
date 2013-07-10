@@ -9,19 +9,50 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
 
+import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
+
 public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
 
-    private Rectangle disconnectStarshipButton, starshipConnectedBox, disconnectNebulaButton,
+    private Rectangle disconnectStarshipButton, nebulaConnectedBox, disconnectNebulaButton,
             shipNameTextField, changeShipNameButton, readyIndicator, readyButton, shipsInGameList, 
-            starshipDisconnectedBox, hostTextField, portTextField, connectButton;
+            nebulaDisconnectedBox, hostTextField, portTextField, connectButton;
     
     private String shipNameText, hostText, portText;
-    private boolean ready;
+    private boolean connectedToNebula, ready;
     private List<String> shipsInGame;
+    
+    private PilotingDisplay pilotingDisplay;
+    
+    public LobbyPanel(PilotingDisplay pilotingDisplay) {
+        this.pilotingDisplay = pilotingDisplay;
+        
+        this.shipNameText = "Mungle Box";
+        this.hostText = "localhost";
+        this.portText = "39461";
+        this.connectedToNebula = false;
+        this.ready = false;
+        this.shipsInGame = new ArrayList<String>();
+        
+        this.disconnectStarshipButton = new Rectangle(10, 10, 200, 30);
+        
+        this.nebulaConnectedBox = new Rectangle(220, 10, 220, 500);
+        this.disconnectNebulaButton = new Rectangle(230, 20, 200, 30);
+        this.shipNameTextField = new Rectangle(230, 60, 200, 30);
+        this.changeShipNameButton = new Rectangle(230, 100, 200, 30);
+        this.readyIndicator = new Rectangle(230, 140, 200, 30);
+        this.readyButton = new Rectangle(230, 180, 200, 30);
+        this.shipsInGameList = new Rectangle(230, 220, 200, 200);
+        
+        this.nebulaDisconnectedBox = new Rectangle(220, 10, 220, 500);
+        this.hostTextField = new Rectangle(230, 20, 200, 30);
+        this.portTextField = new Rectangle(230, 60, 200, 30);
+        this.connectButton = new Rectangle(230, 100, 200, 30);
+    }
     
     private void paintCalibration(Graphics g) {
         int squareSize = 10;
@@ -101,8 +132,13 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     
     private void paintStarshipConnectedBox(Graphics2D g2d) {
         g2d.setColor(Color.LIGHT_GRAY);
-        g2d.fill(starshipConnectedBox);
-        
+        g2d.fill(nebulaConnectedBox);
+        paintDisconnectNebulaButton(g2d);
+        paintShipNameTextField(g2d);
+        paintChangeShipNameButton(g2d);
+        paintReadyIndicator(g2d);
+        paintReadyButton(g2d);
+        paintShipsInGameList(g2d);
     }
     
     private void paintHostTextField(Graphics2D g2d) {
@@ -126,9 +162,22 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         g2d.drawString("Connect", connectButton.x + 10, connectButton.y + 10);
     }
     
+    private void paintStarshipDisconnectedBox(Graphics2D g2d) {
+        g2d.setColor(Color.LIGHT_GRAY);
+        g2d.fill(nebulaConnectedBox);
+        paintHostTextField(g2d);
+        paintPortTextField(g2d);
+        paintConnectButton(g2d);
+    }
+    
     private void paintElements(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        
+        paintDisconnectStarshipButton(g2d);
+        if(this.connectedToNebula) {
+            paintStarshipConnectedBox(g2d);
+        } else {
+            paintStarshipDisconnectedBox(g2d);
+        }
     }
     
     private void clearPanel(Graphics g) {
@@ -141,7 +190,9 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponents(g);
-        paintCalibration(g);
+        clearPanel(g);
+        //paintCalibration(g);
+        paintElements(g);
     }
     
     @Override

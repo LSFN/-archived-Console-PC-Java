@@ -89,7 +89,7 @@ public class PilotingDisplay extends JFrame {
                 this.add(this.menuPanel);
                 this.addKeyListener(menuPanel);
             } else if(this.nextState == DisplayState.LOBBY) {
-                this.lobbyPanel = new LobbyPanel();
+                this.lobbyPanel = new LobbyPanel(this);
                 this.add(this.lobbyPanel);
                 this.addKeyListener(lobbyPanel);
             } else if(this.nextState == DisplayState.PILOTING) {
