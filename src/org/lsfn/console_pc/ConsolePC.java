@@ -54,6 +54,8 @@ public class ConsolePC {
         System.out.println("\tconnect <host> <port> : connects to the Starship on the given host and port.");
         System.out.println("\tconnect               : connects to the Starship on the default host and port.");
         System.out.println("\tdisconnect            : disconnects from the Starship if connected.");
+        System.out.println("\tdisplay start         : starts the GUI.");
+        System.out.println("\tdisplay stop          : stops the GUI.");
         System.out.println("\texit                  : end this program.");
     }
     
@@ -95,6 +97,10 @@ public class ConsolePC {
         }
     }
 
+    public StarshipConnection getStarshipConnection() {
+        return this.starshipConnection;
+    }
+    
     public void run(String[] args) {
         printHelp();
         

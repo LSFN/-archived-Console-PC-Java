@@ -14,7 +14,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
+import org.lsfn.console_pc.STS.STSdown;
+import org.lsfn.console_pc.STS.STSup;
 
 public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
 
@@ -27,6 +28,23 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     private List<String> shipsInGame;
     
     private PilotingDisplay pilotingDisplay;
+    
+    private enum LobbyPanelComponents {
+        NONE,
+        
+        DISCONNECT_STARSHIP_BUTTON,
+        DISCONNECT_NEBULA_BUTTON,
+        SHIP_NAME_TEXT_FIELD,
+        CHANGE_SHIP_NAME_BUTTON,
+        READY_INDICATOR,
+        READY_BUTTON,
+        SHIPS_IN_GAME_LIST,
+        
+        HOST_TEXT_FIELD,
+        PORT_TEXT_FIELD,
+        CONNECT_BUTTON
+    }
+    private LobbyPanelComponents lastComponentClicked;
     
     public LobbyPanel(PilotingDisplay pilotingDisplay) {
         this.pilotingDisplay = pilotingDisplay;
@@ -200,6 +218,27 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         return new Dimension(1280, 1024);
     }
 
+    public void processConnection(STSdown.Connection connection) {
+        if(connection.hasConnected()) {
+            this.connectedToNebula = connection.getConnected();
+        }
+    }
+    
+    public void processLobby(STSdown.Lobby lobby) {
+        if(lobby.hasReadyState()) {
+            this.ready = lobby.getReadyState();
+        }
+        if(lobby.hasGameStarted()) {
+            // TODO Start the game
+        }
+        if(lobby.hasShipName()) {
+            this.shipNameText = lobby.getShipName();
+        }
+        if(lobby.getShipsInGameCount() > 0) {
+            this.shipsInGame = lobby.getShipsInGameList();
+        }
+    }
+    
     @Override
     public void keyPressed(KeyEvent arg0) {
         
@@ -216,8 +255,39 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent arg0) {
-        
+    public void mouseClicked(MouseEvent e) {
+        if(this.connectedToNebula) {
+            if(this.disconnectNebulaButton.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.DISCONNECT_NEBULA_BUTTON;
+                sendDisconnectMessage();
+            } else if(this.shipNameTextField.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.SHIP_NAME_TEXT_FIELD;
+            } else if(this.changeShipNameButton.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.CHANGE_SHIP_NAME_BUTTON;
+                sendChangeShipNameMessage();
+            } else if(this.readyIndicator.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.READY_INDICATOR;
+            } else if(this.readyButton.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.READY_BUTTON;
+                this.ready = !this.ready;
+                sendReadyStateMessage();
+            } else if(this.shipsInGameList.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.SHIPS_IN_GAME_LIST;
+            } else {
+                this.lastComponentClicked = LobbyPanelComponents.NONE;
+            }
+        } else {
+            if(this.hostTextField.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.HOST_TEXT_FIELD;
+            } else if(this.portTextField.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.PORT_TEXT_FIELD;
+            } else if(this.connectButton.contains(e.getPoint())) {
+                this.lastComponentClicked = LobbyPanelComponents.CONNECT_BUTTON;
+                sendConnectMessage();
+            } else {
+                this.lastComponentClicked = LobbyPanelComponents.NONE;
+            }
+        }
     }
 
     @Override
@@ -240,4 +310,37 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         
     }
     
+    private void sendConnectMessage() {
+        STSup.Builder stsUp = STSup.newBuilder();
+        STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
+        stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);
+        stsUpConnection.setHost(hostText);
+        stsUpConnection.setPort(Integer.parseInt(portText));
+        stsUp.setConnection(stsUpConnection);
+        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());
+    }
+    
+    private void sendDisconnectMessage() {
+        STSup.Builder stsUp = STSup.newBuilder();
+        STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
+        stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.DISCONNECT);
+        stsUp.setConnection(stsUpConnection);
+        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());
+    }
+    
+    private void sendChangeShipNameMessage() {
+        STSup.Builder stsUp = STSup.newBuilder();
+        STSup.Lobby.Builder stsUpLobby = STSup.Lobby.newBuilder();
+        stsUpLobby.setShipName(this.shipNameText);
+        stsUp.setLobby(stsUpLobby);
+        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());        
+    }
+    
+    private void sendReadyStateMessage() {
+        STSup.Builder stsUp = STSup.newBuilder();
+        STSup.Lobby.Builder stsUpLobby = STSup.Lobby.newBuilder();
+        stsUpLobby.setReadyState(this.ready);
+        stsUp.setLobby(stsUpLobby);
+        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());
+    }
 }

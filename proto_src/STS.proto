@@ -38,14 +38,18 @@ message STSup {
 }
 
 message STSdown {
-	message Lobby {
-	   optional bool readyState = 1;
-	   optional string shipName = 2;
-	   repeated string shipsInGame = 3;
-	   optional bool gameStarted = 4;
-	}
-	
-	message VisualSensors {
+    message Connection {
+        optional bool connected = 1;
+    }
+
+    message Lobby {
+       optional bool readyState = 1;
+       optional string shipName = 2;
+       repeated string shipsInGame = 3;
+       optional bool gameStarted = 4;
+    }
+    
+    message VisualSensors {
         message SpaceObject {
             enum Type {
                 SHIP = 0;
@@ -66,6 +70,7 @@ message STSdown {
         repeated SpaceObject spaceObjects = 1;
     }
     
-    optional Lobby lobby = 1;
-    optional VisualSensors visualSensors = 2;
+    optional Connection connection = 1;
+    optional Lobby lobby = 2;
+    optional VisualSensors visualSensors = 3;
 }

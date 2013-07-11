@@ -4,10 +4,12 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
+import java.util.List;
 
 import javax.swing.Timer;
 import javax.swing.JFrame;
 
+import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
 
 public class PilotingDisplay extends JFrame {
@@ -104,52 +106,17 @@ public class PilotingDisplay extends JFrame {
     }
     
     private void processInput() {
-        
-    }
-    
-    private void dispatchStarshipMessages() {
-        if(this.starshipConnection.getConnectionStatus() == StarshipConnection.ConnectionStatus.CONNECTED) {
-            // Work out if any states have changed
-            boolean aKeyStateChanged = false;
-            for(int i = 0; i < this.keyStatesChanged.length; i++) {
-                aKeyStateChanged |= this.keyStatesChanged[i];
+        List<STSdown> messages = this.starshipConnection.receiveMessagesFromStarship();
+        for(STSdown message : messages) {
+            if(this.displayState == DisplayState.LOBBY) {
+                if(message.hasConnection()) {
+                    this.lobbyPanel.processConnection(message.getConnection());
+                }
+                if(message.hasLobby()) {
+                    this.lobbyPanel.processLobby(message.getLobby());
+                }
             }
             
-            // If some state has changed, prepare the appropriate message
-            // more clauses to go in this if statement, it is not redundant
-            if(aKeyStateChanged) {
-                STSup.Builder stsUp = STSup.newBuilder();
-                if(aKeyStateChanged) {
-                    STSup.Piloting.Builder stsUpPiloting = STSup.Piloting.newBuilder();
-                    if(this.keyStatesChanged[0]) {
-                        stsUpPiloting.setTurnAnti(this.keyStatesChanged[0]);
-                        this.keyStatesChanged[0] = false;
-                    }
-                    if(this.keyStatesChanged[1]) {
-                        stsUpPiloting.setTurnClock(this.keyStatesChanged[1]);
-                        this.keyStatesChanged[1] = false;
-                    }
-                    if(this.keyStatesChanged[2]) {
-                        stsUpPiloting.setThrustLeft(this.keyStatesChanged[2]);
-                        this.keyStatesChanged[2] = false;
-                    }
-                    if(this.keyStatesChanged[3]) {
-                        stsUpPiloting.setThrustRight(this.keyStatesChanged[3]);
-                        this.keyStatesChanged[3] = false;
-                    }
-                    if(this.keyStatesChanged[4]) {
-                        stsUpPiloting.setThrustForward(this.keyStatesChanged[4]);
-                        this.keyStatesChanged[4] = false;
-                    }
-                    if(this.keyStatesChanged[5]) {
-                        stsUpPiloting.setThrustBackward(this.keyStatesChanged[5]);
-                        this.keyStatesChanged[5] = false;
-                    }
-                    stsUp.setPiloting(stsUpPiloting);
-                }
-                
-                this.starshipConnection.sendMessageToStarship(stsUp.build());
-            }
         }
     }
     
