@@ -70,6 +70,8 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         this.hostTextField = new Rectangle(230, 20, 200, 30);
         this.portTextField = new Rectangle(230, 60, 200, 30);
         this.connectButton = new Rectangle(230, 100, 200, 30);
+        
+        this.addMouseListener(this);
     }
     
     private void paintCalibration(Graphics g) {
@@ -311,6 +313,7 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     }
     
     private void sendConnectMessage() {
+        System.out.println("Sending connection message.");
         STSup.Builder stsUp = STSup.newBuilder();
         STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
         stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);

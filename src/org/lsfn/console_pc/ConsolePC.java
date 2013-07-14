@@ -15,13 +15,12 @@ public class ConsolePC {
     private boolean keepGoing;
     
     public ConsolePC() {
-        this.starshipConnection = null;
+        this.starshipConnection = new StarshipConnection();
         this.pilotingDisplay = null;
         this.keepGoing = true;
     }
     
     public void startStarshipClient(String host, Integer port) {
-        this.starshipConnection = new StarshipConnection();
         System.out.println("Connecting...");
         ConnectionStatus status = ConnectionStatus.DISCONNECTED;
         if(host == null || port == null) {

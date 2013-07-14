@@ -1,16 +1,14 @@
 package org.lsfn.console_pc;
 
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferStrategy;
 import java.util.List;
 
-import javax.swing.Timer;
 import javax.swing.JFrame;
+import javax.swing.Timer;
 
 import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.STS.STSup;
+import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 
 public class PilotingDisplay extends JFrame {
     
@@ -102,26 +100,33 @@ public class PilotingDisplay extends JFrame {
             this.pack();
             
             this.displayState = this.nextState;
+            System.out.println("Display state: " + this.displayState);
         }
     }
     
     private void processInput() {
-        List<STSdown> messages = this.starshipConnection.receiveMessagesFromStarship();
-        for(STSdown message : messages) {
-            if(this.displayState == DisplayState.LOBBY) {
-                if(message.hasConnection()) {
-                    this.lobbyPanel.processConnection(message.getConnection());
+        if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+            List<STSdown> messages = this.starshipConnection.receiveMessagesFromStarship();
+            for(STSdown message : messages) {
+                System.out.println("Processing message");
+                if(this.displayState == DisplayState.LOBBY) {
+                    if(message.hasConnection()) {
+                        System.out.println("\tconnection");
+                        this.lobbyPanel.processConnection(message.getConnection());
+                    }
+                    if(message.hasLobby()) {
+                        System.out.println("\tlobby");
+                        this.lobbyPanel.processLobby(message.getLobby());
+                    }
                 }
-                if(message.hasLobby()) {
-                    this.lobbyPanel.processLobby(message.getLobby());
-                }
+                
             }
-            
         }
     }
     
     public void tick() {
         displayStateChange();
+        processInput();
         this.repaint();
     }
     

@@ -1,0 +1,2 @@
+scons
+jar cfm console-pc.jar Manifest.txt -C build/ org/lsfn/console_pc/ lib

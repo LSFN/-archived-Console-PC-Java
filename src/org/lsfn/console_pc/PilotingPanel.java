@@ -11,8 +11,6 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 
-import org.lsfn.console_pc.STS.STSup;
-
 public class PilotingPanel extends JPanel implements MouseListener, KeyListener {
     
     public PilotingPanel() {

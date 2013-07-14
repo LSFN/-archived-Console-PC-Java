@@ -124,6 +124,7 @@ public class StarshipConnection extends Thread {
         if(this.connectionStatus == ConnectionStatus.CONNECTED) {
             try {
                 upMessage.writeDelimitedTo(this.starshipOutput);
+                this.starshipOutput.flush();
             } catch (IOException e) {
                 e.printStackTrace();
                 closeConnection();
