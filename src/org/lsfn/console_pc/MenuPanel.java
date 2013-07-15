@@ -92,11 +92,8 @@ public class MenuPanel extends JPanel implements MouseListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println("Key pressed");
         char character = e.getKeyChar();
         int code = e.getKeyCode();
-        
-        System.out.println(character + " " + code);
         
         if(this.lastComponentClicked == MenuPanelComponents.HOST_TEXT_FIELD) {
             // The character space of ' ' through '~' is the set of printable characters 

@@ -125,6 +125,7 @@ public class StarshipConnection extends Thread {
             try {
                 upMessage.writeDelimitedTo(this.starshipOutput);
                 this.starshipOutput.flush();
+                System.out.println(upMessage);
             } catch (IOException e) {
                 e.printStackTrace();
                 closeConnection();

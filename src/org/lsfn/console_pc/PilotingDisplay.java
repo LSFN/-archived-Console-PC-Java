@@ -108,14 +108,11 @@ public class PilotingDisplay extends JFrame {
         if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
             List<STSdown> messages = this.starshipConnection.receiveMessagesFromStarship();
             for(STSdown message : messages) {
-                System.out.println("Processing message");
                 if(this.displayState == DisplayState.LOBBY) {
                     if(message.hasConnection()) {
-                        System.out.println("\tconnection");
                         this.lobbyPanel.processConnection(message.getConnection());
                     }
                     if(message.hasLobby()) {
-                        System.out.println("\tlobby");
                         this.lobbyPanel.processLobby(message.getLobby());
                     }
                 }

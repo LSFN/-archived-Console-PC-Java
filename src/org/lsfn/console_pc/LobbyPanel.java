@@ -125,13 +125,13 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         } else {
             g2d.setColor(Color.RED);
         }
-        g2d.fillOval(readyIndicator.x + 10, readyIndicator.y + 10, 20, 20);
+        g2d.fillOval(readyIndicator.x + 5, readyIndicator.y + 5, 20, 20);
         if(ready) {
             g2d.setColor(Color.GREEN);
         } else {
             g2d.setColor(Color.DARK_GRAY);
         }
-        g2d.fillOval(readyIndicator.x + 40, readyIndicator.y + 10, 20, 20);
+        g2d.fillOval(readyIndicator.x + 35, readyIndicator.y + 5, 20, 20);
     }
     
     private void paintReadyButton(Graphics2D g2d) {
@@ -242,8 +242,21 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     }
     
     @Override
-    public void keyPressed(KeyEvent arg0) {
+    public void keyPressed(KeyEvent e) {
+        char character = e.getKeyChar();
+        int code = e.getKeyCode();
         
+        if(this.lastComponentClicked == LobbyPanelComponents.SHIP_NAME_TEXT_FIELD) {
+            // The range of characters from ' ' through to '~' is the set of printable ascii characters 
+            if((int)character >= (int)' ' && (int)character <= (int)'~') {
+                this.hostText = this.hostText + character;
+            } else if(code == KeyEvent.VK_BACK_SPACE) {
+                if(this.hostText.length() > 0) {
+                    this.hostText = this.hostText.substring(0, this.hostText.length() - 1);
+                }
+            }
+        }
+         
     }
 
     @Override
