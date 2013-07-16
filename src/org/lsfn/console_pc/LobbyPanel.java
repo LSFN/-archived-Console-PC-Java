@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import org.lsfn.console_pc.PilotingDisplay.DisplayState;
 import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
 
@@ -230,8 +231,15 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         if(lobby.hasReadyState()) {
             this.ready = lobby.getReadyState();
         }
-        if(lobby.hasGameStarted()) {
-            // TODO Start the game
+        // This one is confusing:
+        // lobby.hasGameStarted() returns true if the message contains information
+        // on whether the game has started or not and does not represent whether
+        // the game has actually started.
+        // if there is information on whether the game has started, lobby.getGameStarted()
+        // gets this information. Thus the && statement is only true if the game has
+        // actually started. 
+        if(lobby.hasGameStarted() && lobby.getGameStarted()) {
+            this.pilotingDisplay.changeDisplayState(DisplayState.PILOTING);
         }
         if(lobby.hasShipName()) {
             this.shipNameText = lobby.getShipName();
@@ -249,10 +257,10 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         if(this.lastComponentClicked == LobbyPanelComponents.SHIP_NAME_TEXT_FIELD) {
             // The range of characters from ' ' through to '~' is the set of printable ascii characters 
             if((int)character >= (int)' ' && (int)character <= (int)'~') {
-                this.hostText = this.hostText + character;
+                this.shipNameText = this.shipNameText + character;
             } else if(code == KeyEvent.VK_BACK_SPACE) {
-                if(this.hostText.length() > 0) {
-                    this.hostText = this.hostText.substring(0, this.hostText.length() - 1);
+                if(this.shipNameText.length() > 0) {
+                    this.shipNameText = this.shipNameText.substring(0, this.shipNameText.length() - 1);
                 }
             }
         }

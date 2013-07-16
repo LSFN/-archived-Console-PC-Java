@@ -18,7 +18,6 @@ public class PilotingDisplay extends JFrame {
     
     private ConsolePC consolePC;
     private StarshipConnection starshipConnection;
-    private boolean[] keyStates, keyStatesChanged;
 
     public enum DisplayState{
         MENU,
@@ -52,14 +51,6 @@ public class PilotingDisplay extends JFrame {
         this.starshipConnection = starshipConnection;
         this.displayState = DisplayState.MENU;
         this.nextState = DisplayState.MENU;
-        this.keyStates = new boolean[6];
-        for(int i = 0; i < this.keyStates.length; i++) {
-            this.keyStates[i] = false;
-        }
-        this.keyStatesChanged = new boolean[6];
-        for(int i = 0; i < this.keyStatesChanged.length; i++) {
-            this.keyStatesChanged[i] = false;
-        }
         
         this.timer = new Timer(tickInterval, new Ticker(this));
     }
@@ -93,7 +84,7 @@ public class PilotingDisplay extends JFrame {
                 this.add(this.lobbyPanel);
                 this.addKeyListener(lobbyPanel);
             } else if(this.nextState == DisplayState.PILOTING) {
-                this.pilotingPanel = new PilotingPanel();
+                this.pilotingPanel = new PilotingPanel(this);
                 this.add(this.pilotingPanel);
                 this.addKeyListener(this.pilotingPanel);
             }
@@ -115,15 +106,25 @@ public class PilotingDisplay extends JFrame {
                     if(message.hasLobby()) {
                         this.lobbyPanel.processLobby(message.getLobby());
                     }
+                } else if (this.displayState == DisplayState.PILOTING) {
+                    if(message.hasVisualSensors()) {
+                        this.pilotingPanel.processVisualSensors(message.getVisualSensors());
+                    }
                 }
-                
             }
+        }
+    }
+    
+    private void generateOutput() {
+        if(this.displayState == DisplayState.PILOTING) {
+            this.pilotingPanel.generateOutput();
         }
     }
     
     public void tick() {
         displayStateChange();
         processInput();
+        generateOutput();
         this.repaint();
     }
     
