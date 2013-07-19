@@ -20,6 +20,7 @@ import org.lsfn.console_pc.SpaceObject.ObjectType;
 
 public class PilotingPanel extends JPanel implements MouseListener, KeyListener {
     
+    // TODO zoom
     private static int scale = 10;
     
     private PilotingDisplay pilotingDisplay;
@@ -92,7 +93,7 @@ public class PilotingPanel extends JPanel implements MouseListener, KeyListener 
                 g2d.fillPolygon(xs, ys, 3);
             } else if(so.getObjectType() == ObjectType.ASTEROID) {
                 g2d.setColor(Color.YELLOW);
-                g2d.fillOval((int)(so.getX() * scale) + centreX, (int)(so.getY() * scale) + centreY, scale*2, scale*2);
+                g2d.fillOval((int)this.convertX(so.getX()) - scale, (int)this.convertY(so.getY()) - scale, scale*2, scale*2);
             }
         }
     }
@@ -162,27 +163,27 @@ public class PilotingPanel extends JPanel implements MouseListener, KeyListener 
             STSup.Builder stsUp = STSup.newBuilder();
             STSup.Piloting.Builder stsUpPiloting = STSup.Piloting.newBuilder();
             if(this.keyStatesChanged[0]) {
-                stsUpPiloting.setTurnAnti(this.keyStatesChanged[0]);
+                stsUpPiloting.setTurnAnti(this.keyStates[0]);
                 this.keyStatesChanged[0] = false;
             }
             if(this.keyStatesChanged[1]) {
-                stsUpPiloting.setTurnClock(this.keyStatesChanged[1]);
+                stsUpPiloting.setTurnClock(this.keyStates[1]);
                 this.keyStatesChanged[1] = false;
             }
             if(this.keyStatesChanged[2]) {
-                stsUpPiloting.setThrustLeft(this.keyStatesChanged[2]);
+                stsUpPiloting.setThrustLeft(this.keyStates[2]);
                 this.keyStatesChanged[2] = false;
             }
             if(this.keyStatesChanged[3]) {
-                stsUpPiloting.setThrustRight(this.keyStatesChanged[3]);
+                stsUpPiloting.setThrustRight(this.keyStates[3]);
                 this.keyStatesChanged[3] = false;
             }
             if(this.keyStatesChanged[4]) {
-                stsUpPiloting.setThrustForward(this.keyStatesChanged[4]);
+                stsUpPiloting.setThrustForward(this.keyStates[4]);
                 this.keyStatesChanged[4] = false;
             }
             if(this.keyStatesChanged[5]) {
-                stsUpPiloting.setThrustBackward(this.keyStatesChanged[5]);
+                stsUpPiloting.setThrustBackward(this.keyStates[5]);
                 this.keyStatesChanged[5] = false;
             }
             stsUp.setPiloting(stsUpPiloting);
@@ -264,5 +265,13 @@ public class PilotingPanel extends JPanel implements MouseListener, KeyListener 
     @Override
     public void mouseReleased(MouseEvent e) {
         
+    }
+    
+    private double convertX(double x) {
+        return (x * scale) + (this.getBounds().width/2);
+    }
+    
+    private double convertY(double y) {
+        return -(y * scale) + (this.getBounds().height/2);
     }
 }
