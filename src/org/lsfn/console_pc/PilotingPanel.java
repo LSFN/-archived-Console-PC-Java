@@ -69,6 +69,7 @@ public class PilotingPanel extends JPanel implements MouseListener, KeyListener 
     private void paintBackground(Graphics2D g2d) {
         int width = this.getBounds().width;
         int height = this.getBounds().height;
+        g2d.setColor(new Color(0, 0, 128));
         if(width > height) {
             g2d.fillOval(width/2 - height/2, 0, height, height);
         } else {
@@ -77,23 +78,21 @@ public class PilotingPanel extends JPanel implements MouseListener, KeyListener 
     }
     
     private void paintObjects(Graphics2D g2d) {
-        int centreX = this.getBounds().width / 2;
-        int centreY = this.getBounds().height / 2;
         for(SpaceObject so : this.objectList) {
             if(so.getObjectType() == ObjectType.SHIP) {
                 int[] xs = new int[3];
                 int[] ys = new int[3];
-                xs[0] = ((int)((Math.cos(so.getTheta()) * 2) + so.getX()) * scale) + centreX;
-                ys[0] = -((int)((Math.sin(so.getTheta()) * 2) + so.getY()) * scale) + centreY;
-                xs[1] = ((int)((Math.cos(so.getTheta() + (Math.PI/2))) + so.getX()) * scale) + centreX;
-                ys[1] = -((int)((Math.sin(so.getTheta() + (Math.PI/2))) + so.getY()) * scale) + centreY;
-                xs[2] = ((int)((Math.cos(so.getTheta() - (Math.PI/2))) + so.getX()) * scale) + centreX;
-                ys[2] = -((int)((Math.sin(so.getTheta() - (Math.PI/2))) + so.getY()) * scale) + centreY;
+                xs[0] = (int)(convertX((-Math.sin(so.getTheta()) * 2) + so.getX()));
+                ys[0] = (int)(convertY((Math.cos(so.getTheta()) * 2) + so.getY()));
+                xs[1] = (int)(convertX(Math.cos(so.getTheta()) + so.getX()));
+                ys[1] = (int)(convertY(Math.sin(so.getTheta()) + so.getY()));
+                xs[2] = (int)(convertX(-Math.cos(so.getTheta()) + so.getX()));
+                ys[2] = (int)(convertY(-Math.sin(so.getTheta()) + so.getY()));
                 g2d.setColor(Color.GREEN);
                 g2d.fillPolygon(xs, ys, 3);
             } else if(so.getObjectType() == ObjectType.ASTEROID) {
                 g2d.setColor(Color.YELLOW);
-                g2d.fillOval((int)this.convertX(so.getX()) - scale, (int)this.convertY(so.getY()) - scale, scale*2, scale*2);
+                g2d.fillOval((int)convertX(so.getX()) - scale, (int)convertY(so.getY()) - scale, scale*2, scale*2);
             }
         }
     }
