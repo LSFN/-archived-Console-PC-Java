@@ -6,134 +6,80 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.lsfn.console_pc.STS.*;
+import org.lsfn.console_pc.STS.STSdown.Join.Response;
 
 public class StarshipConnection extends Thread {
 
-    private static final String defaultHost = "localhost";
-    private static final Integer defaultPort = 39460;
-    private static final Integer pollWait = 50;
+    private static final Integer tickInterval = 50;
+    private static final long timeout = 5000;
+    private static final long timeBetweenPings = 3000;
+    private static final STSup pingMessage = STSup.newBuilder().build();
     
     private Socket starshipSocket;
     private BufferedInputStream starshipInput;
     private BufferedOutputStream starshipOutput;
-    private ArrayList<STSdown> starshipMessages;
-    
-    private String host;
-    private Integer port;
-    
-    public enum ConnectionStatus {
-        CONNECTED,
-        DISCONNECTED
-    }
-    private ConnectionStatus connectionStatus;
+    private List<STSdown> starshipMessages;
+    private long timeLastMessageReceived;
+    private long timeLastMessageSent;
+    private boolean connected;
     
     public StarshipConnection() {
-        super();
         this.starshipSocket = null;
         this.starshipInput = null;
         this.starshipOutput = null;
-        this.starshipMessages = null;
-        this.host = null;
-        this.port = null;
-        this.connectionStatus = ConnectionStatus.DISCONNECTED;
+        this.starshipMessages = new ArrayList<STSdown>();
+        this.timeLastMessageSent = 0;
+        this.timeLastMessageReceived = 0;
+        this.connected = false;
     }
     
-    public String getHost() {
-        return host;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-    
-    public ConnectionStatus getConnectionStatus() {
-        return connectionStatus;
-    }
-    
-    private void clearConnection() {
-        this.starshipSocket = null;
-        this.starshipInput = null;
-        this.starshipOutput = null;
-        this.starshipMessages = null;
-    }
-    
-    /**
-     * Closes the connection to the remote host.
-     * Designed for cases where we don't care if closing the connection fails,
-     * we are getting out of this connection one way or the other...
-     * ...like a bad relationship.
-     */
-    private void closeConnection() {
+    public boolean connect(String host, Integer port) {
+        this.connected = false;
         try {
-            this.starshipOutput.close();
-        } catch (IOException e) {
+            this.starshipSocket = new Socket(host, port);
+            this.starshipInput = new BufferedInputStream(starshipSocket.getInputStream());
+            this.starshipOutput = new BufferedOutputStream(starshipSocket.getOutputStream());
+            this.connected = true;
+            this.timeLastMessageReceived = System.currentTimeMillis();
+            this.timeLastMessageSent = System.currentTimeMillis();
+        } catch(IOException e) {
             e.printStackTrace();
         }
+        
+        return this.connected;
     }
     
-    /**
-     * Connects to the given host on the given port.
-     * Will not connect to another host whilst connected.
-     * Will not change the connection status from previous disconnected status if connection fails.
-     * @param host The host to connect to.
-     * @param port The port to connect on.
-     * @return The new connection status of the connection.
-     */
-    public ConnectionStatus connect(String host, Integer port) {
-        if(this.connectionStatus != ConnectionStatus.CONNECTED) {
-            this.host = host;
-            this.port = port;
-            try {
-                this.starshipSocket = new Socket(this.host, this.port);
-                this.starshipInput = new BufferedInputStream(starshipSocket.getInputStream());
-                this.starshipOutput = new BufferedOutputStream(starshipSocket.getOutputStream());
-                this.starshipMessages = new ArrayList<STSdown>();
-                this.connectionStatus = ConnectionStatus.CONNECTED;
-            } catch (IOException e) {
-                e.printStackTrace();
-                clearConnection();
-            }
+    public boolean isConnected() {
+        if(this.connected && System.currentTimeMillis() >= this.timeLastMessageReceived + timeout) {
+            this.disconnect();
         }
-        return this.connectionStatus;
+        return this.connected;
     }
     
-    public ConnectionStatus connect() {
-        return this.connect(defaultHost, defaultPort);
+    public void disconnect() {
+        try {
+            this.starshipSocket.close();
+        } catch (IOException e) {
+            // We don't care
+            e.printStackTrace();
+        }
+        this.connected = false;
     }
     
-    /**
-     * Disconnects from the remote host.
-     * @return The new connection status of the connection.
-     */
-    public ConnectionStatus disconnect() {
-        closeConnection();
-        clearConnection();
-        this.connectionStatus = ConnectionStatus.DISCONNECTED;
-        return this.connectionStatus;
-    }
-    
-    /**
-     * Sends a message to the Starship that this class is connected to.
-     * Won't sent a message when disconnected
-     * @param upMessage The message to be sent.
-     * @return The new connection status of the connection.
-     */
-    public ConnectionStatus sendMessageToStarship(STSup upMessage) {
-        if(this.connectionStatus == ConnectionStatus.CONNECTED) {
+    public void sendMessageToStarship(STSup upMessage) {
+        if(this.connected) {
             try {
                 upMessage.writeDelimitedTo(this.starshipOutput);
                 this.starshipOutput.flush();
-                System.out.println(upMessage);
+                this.timeLastMessageSent = System.currentTimeMillis();
             } catch (IOException e) {
                 e.printStackTrace();
-                closeConnection();
-                clearConnection();
-                this.connectionStatus = ConnectionStatus.DISCONNECTED;
+                this.connected = false;
             }
         }
-        return this.connectionStatus;
     }
     
     public synchronized List<STSdown> receiveMessagesFromStarship() {
@@ -148,23 +94,32 @@ public class StarshipConnection extends Thread {
     
     @Override
     public void run() {
-        while(this.connectionStatus == ConnectionStatus.CONNECTED) {
+        while(this.connected) {
             try {
                 if(this.starshipInput.available() > 0) {
+                    this.timeLastMessageReceived = System.currentTimeMillis();
                     STSdown downMessage = STSdown.parseDelimitedFrom(this.starshipInput);
-                    addMessageToBuffer(downMessage);
+                    // Messages of size 0 are keep alives
+                    if(downMessage.getSerializedSize() > 0) {
+                        addMessageToBuffer(downMessage);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                closeConnection();
-                clearConnection();
+                this.connected = false;
             }
+            
+            if(System.currentTimeMillis() >= this.timeLastMessageSent + timeBetweenPings) {
+                sendMessageToStarship(pingMessage);
+            }
+            
             try {
-                Thread.sleep(pollWait);
+                Thread.sleep(tickInterval);
             } catch (InterruptedException e) {
                 // An interrupt indicates that something has happened to the connection
                 // This loop will now probably terminate.
             }
         }
     }
+    
 }

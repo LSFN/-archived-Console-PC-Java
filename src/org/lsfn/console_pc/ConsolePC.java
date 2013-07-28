@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.lsfn.console_pc.PilotingDisplay.DisplayState;
-import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 
 public class ConsolePC {
 
@@ -22,13 +21,7 @@ public class ConsolePC {
     
     public void startStarshipClient(String host, Integer port) {
         System.out.println("Connecting...");
-        ConnectionStatus status = ConnectionStatus.DISCONNECTED;
-        if(host == null || port == null) {
-            status = this.starshipConnection.connect();
-        } else {
-            status = this.starshipConnection.connect(host, port);
-        }
-        if(status == ConnectionStatus.CONNECTED) {
+        if(this.starshipConnection.connect(host, port)) {
             this.starshipConnection.start();
             System.out.println("Connected.");
             this.pilotingDisplay.changeDisplayState(DisplayState.LOBBY);
@@ -40,7 +33,7 @@ public class ConsolePC {
 
     private void stopStarshipClient() {
         if(this.starshipConnection != null) {
-            if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+            if(this.starshipConnection.isConnected()) {
                 this.starshipConnection.disconnect();
             }
         }
@@ -112,21 +105,7 @@ public class ConsolePC {
             }
         }
         
-        // Close up the threads
-        if(this.starshipConnection != null) {
-            if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
-                System.out.println("Disconnecting from Starship...");
-                this.starshipConnection.disconnect();
-            }
-            if(this.starshipConnection.isAlive()) {
-                try {
-                    System.out.println("Joining listener thread...");
-                    this.starshipConnection.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        // TODO perform sensible shutdown
     }
     
     /**

@@ -8,7 +8,6 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 
 import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.StarshipConnection.ConnectionStatus;
 
 public class PilotingDisplay extends JFrame {
     
@@ -96,7 +95,7 @@ public class PilotingDisplay extends JFrame {
     }
     
     private void processInput() {
-        if(this.starshipConnection.getConnectionStatus() == ConnectionStatus.CONNECTED) {
+        if(this.starshipConnection.isConnected()) {
             List<STSdown> messages = this.starshipConnection.receiveMessagesFromStarship();
             for(STSdown message : messages) {
                 if(this.displayState == DisplayState.LOBBY) {
