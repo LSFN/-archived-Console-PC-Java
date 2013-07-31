@@ -16,7 +16,6 @@ public class LobbyView implements View {
     private String shipNameText, hostText, portText, previousShipName;
     
     private DataManager dataManager;
-    private ViewManager viewManager;
     
     private enum LobbyComponents {
         NONE,
@@ -35,9 +34,8 @@ public class LobbyView implements View {
     }
     private LobbyComponents lastComponentClicked;
     
-    public LobbyView(ViewManager viewManager, DataManager dataManager) {
+    public LobbyView(DataManager dataManager) {
         this.dataManager = dataManager;
-        this.viewManager = viewManager;
         
         this.hostText = "localhost";
         this.portText = "39461";

@@ -1,100 +1,54 @@
 package org.lsfn.console_pc;
 
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.lsfn.console_pc.PilotingDisplay.DisplayState;
+import javax.swing.JFrame;
 
-public class ConsolePC {
+public class ConsolePC extends JFrame {
 
-    private StarshipConnection starshipConnection;
-    private PilotingDisplay pilotingDisplay;
+    private ViewManager viewManager;
     private boolean keepGoing;
     
     public ConsolePC() {
-        this.starshipConnection = new StarshipConnection();
-        this.pilotingDisplay = null;
+        super();
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.setFocusable(true);
+        //this.setUndecorated(true);
+        this.setSize(WIDTH, HEIGHT);
+        this.setVisible(true);
+        this.createBufferStrategy(2);
+        this.viewManager = new ViewManager();
+        this.add(viewManager);
+        this.addKeyListener(this.viewManager);
+        this.pack();
+        
         this.keepGoing = true;
-    }
-    
-    public void startStarshipClient(String host, Integer port) {
-        System.out.println("Connecting...");
-        if(this.starshipConnection.connect(host, port)) {
-            this.starshipConnection.start();
-            System.out.println("Connected.");
-            this.pilotingDisplay.changeDisplayState(DisplayState.LOBBY);
-        } else {
-            System.out.println("Connection failed.");
-        }
-    }
-    
-
-    private void stopStarshipClient() {
-        if(this.starshipConnection != null) {
-            if(this.starshipConnection.isConnected()) {
-                this.starshipConnection.disconnect();
-            }
-        }
-        System.out.println("Disconnected.");
     }
     
     private void printHelp() {
         System.out.println("Console-PC commands:");
         System.out.println("\thelp                  : print this help text.");
-        System.out.println("\tconnect <host> <port> : connects to the Starship on the given host and port.");
-        System.out.println("\tconnect               : connects to the Starship on the default host and port.");
-        System.out.println("\tdisconnect            : disconnects from the Starship if connected.");
-        System.out.println("\tdisplay start         : starts the GUI.");
-        System.out.println("\tdisplay stop          : stops the GUI.");
         System.out.println("\texit                  : end this program.");
-    }
-    
-    private void startDisplay() {
-        this.pilotingDisplay = new PilotingDisplay(this, this.starshipConnection);
-        this.pilotingDisplay.start();
-    }
-
-    public void stopDisplay() {
-        this.pilotingDisplay.stop();
-        this.pilotingDisplay.dispatchEvent(new WindowEvent(this.pilotingDisplay, WindowEvent.WINDOW_CLOSING));
     }
     
     private void processCommand(String commandStr) {
         String[] commandParts = commandStr.split(" ");
          
-        if(commandParts[0].equals("connect")) {
-            if(commandParts.length == 3) {
-                startStarshipClient(commandParts[1], Integer.parseInt(commandParts[2]));
-            } else if(commandParts.length == 1) {
-                startStarshipClient(null, null);
-            }
-        } else if(commandParts[0].equals("disconnect")) {
-            stopStarshipClient();
-        } else if(commandParts[0].equals("exit")) {
+        if(commandParts[0].equals("exit")) {
             this.keepGoing = false;
         } else if(commandParts[0].equals("help")) {
             printHelp();
-        } else if(commandParts[0].equals("display")) {
-            if(commandParts[1].equals("start")) {
-                startDisplay();
-            } else if (commandParts[1].equals("stop")){
-                stopDisplay();
-            } else {
-                System.out.println("The display can't do that, try something within the bounds of feasibility.");
-            }
         } else {
             System.out.println("You're spouting gibberish. Please try English.");
         }
     }
 
-    public StarshipConnection getStarshipConnection() {
-        return this.starshipConnection;
-    }
-    
     public void run(String[] args) {
         printHelp();
+        
+        this.viewManager.start();
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while(this.keepGoing) {

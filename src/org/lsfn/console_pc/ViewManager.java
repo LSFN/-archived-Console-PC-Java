@@ -3,10 +3,12 @@ package org.lsfn.console_pc;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JPanel;
 
-public class ViewManager extends JPanel implements Runnable {
+public class ViewManager extends JPanel implements Runnable, KeyListener {
 
     private static final Integer tickInterval = 50;
     
@@ -52,7 +54,13 @@ public class ViewManager extends JPanel implements Runnable {
     
     private void viewChange() {
         if(this.currentView != this.nextView) {
-            
+            if(this.nextView == ViewState.MENU) {
+                this.view = new MenuView(this, this.dataManager);
+            } else if(this.nextView == ViewState.LOBBY) {
+                this.view = new LobbyView(this.dataManager);
+            } else if(this.nextView == ViewState.LOBBY) {
+                this.view = new PilotingView(this.dataManager);
+            }
         }
     }
     
@@ -63,6 +71,7 @@ public class ViewManager extends JPanel implements Runnable {
         // Process the input from the Starship
         this.dataManager.processInput();
         // Repaint will cause paintComponent to be called at some convenient point in the future
+        // This, in turn, will paint the current view
         repaint();
         // Generate and send output to the Starship
         this.dataManager.generateOutput();
@@ -72,6 +81,21 @@ public class ViewManager extends JPanel implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        this.view.keyPressed(e);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        this.view.keyReleased(e);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        this.view.keyTyped(e);
     }
     
     
