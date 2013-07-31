@@ -56,6 +56,8 @@ public class LobbyView implements View {
         this.hostTextField = new Rectangle(230, 20, 200, 30);
         this.portTextField = new Rectangle(230, 60, 200, 30);
         this.connectButton = new Rectangle(230, 100, 200, 30);
+        
+        this.lastComponentClicked = LobbyComponents.NONE;
     }
     
     @Override
@@ -181,10 +183,10 @@ public class LobbyView implements View {
     }
     
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyPressed(KeyEvent e) {
         char character = e.getKeyChar();
         int code = e.getKeyCode();
-        
+
         if(this.lastComponentClicked == LobbyComponents.SHIP_NAME_TEXT_FIELD) {
             // The range of characters from ' ' through to '~' is the set of printable ascii characters 
             if((int)character >= (int)' ' && (int)character <= (int)'~') {
@@ -194,7 +196,7 @@ public class LobbyView implements View {
                     this.shipNameText = this.shipNameText.substring(0, this.shipNameText.length() - 1);
                 }
             }
-        } else if (this.lastComponentClicked == LobbyComponents.HOST_TEXT_FIELD) {
+        } else if(this.lastComponentClicked == LobbyComponents.HOST_TEXT_FIELD) {
             // The character space of ' ' through '~' is the set of printable characters 
             if((int)character >= (int)' ' && (int)character <= (int)'~') {
                 this.hostText = this.hostText + character;
@@ -213,16 +215,15 @@ public class LobbyView implements View {
                 }
             }
         }
-
-    }
-    
-    @Override
-    public void keyPressed(KeyEvent arg0) {
-
     }
 
     @Override
     public void keyReleased(KeyEvent arg0) {
+        
+    }
+    
+    @Override
+    public void keyTyped(KeyEvent arg0) {
 
     }
 

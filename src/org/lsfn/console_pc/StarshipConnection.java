@@ -45,6 +45,7 @@ public class StarshipConnection extends Thread {
             this.connected = true;
             this.timeLastMessageReceived = System.currentTimeMillis();
             this.timeLastMessageSent = System.currentTimeMillis();
+            this.start();
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -83,8 +84,8 @@ public class StarshipConnection extends Thread {
     }
     
     public synchronized List<STSdown> receiveMessagesFromStarship() {
-        List<STSdown> result = new ArrayList<STSdown>(this.starshipMessages);
-        this.starshipMessages.clear();
+        List<STSdown> result = this.starshipMessages;
+        this.starshipMessages = new ArrayList<STSdown>();
         return result;
     }
 

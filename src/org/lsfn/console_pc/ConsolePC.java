@@ -13,14 +13,14 @@ public class ConsolePC extends JFrame {
     
     public ConsolePC() {
         super();
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(true);
         //this.setUndecorated(true);
         this.setSize(WIDTH, HEIGHT);
         this.setVisible(true);
         this.createBufferStrategy(2);
         this.viewManager = new ViewManager();
-        this.add(viewManager);
+        this.add(this.viewManager);
         this.addKeyListener(this.viewManager);
         this.pack();
         

@@ -148,8 +148,8 @@ public class DataManager {
         }
     }
     
-    public boolean connectToStarship(String host, Integer port) {
-        return this.starshipConnection.connect(host, port);
+    public void connectToStarship(String host, Integer port) {
+        this.starshipConnection.connect(host, port);
     }
     
     public boolean isConnectedToStarship() {

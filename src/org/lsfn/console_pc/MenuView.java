@@ -1,22 +1,16 @@
 package org.lsfn.console_pc;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.List;
-
-import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.ViewManager.ViewState;
 
 public class MenuView implements View {
     
     private String hostText, portText;
     private Rectangle hostTextField, portTextField, connectButton, exitButton;
     private DataManager dataManager;
-    private ViewManager viewManager;
     
     private enum MenuComponents {
         NONE,
@@ -27,9 +21,8 @@ public class MenuView implements View {
     }
     private MenuComponents lastComponentClicked;
     
-    public MenuView(ViewManager viewManager, DataManager dataManager) {
+    public MenuView( DataManager dataManager) {
         this.dataManager = dataManager;
-        this.viewManager = viewManager;
         this.lastComponentClicked = MenuComponents.NONE;
         this.hostText = "localhost";
         this.portText = "39460";
@@ -85,9 +78,7 @@ public class MenuView implements View {
         } else if(this.connectButton.contains(e.getPoint())) {
             System.out.println("Connect button clicked");
             this.lastComponentClicked = MenuComponents.CONNECT_BUTTON;
-            if(this.dataManager.connectToStarship(this.hostText, Integer.valueOf(this.portText))) {
-                this.viewManager.changeView(ViewState.LOBBY);
-            }
+            this.dataManager.connectToStarship(this.hostText, Integer.valueOf(this.portText));
         } else if(this.exitButton.contains(e.getPoint())) {
             System.out.println("exit button clicked");
             this.lastComponentClicked = MenuComponents.EXIT_BUTTON;
@@ -117,17 +108,7 @@ public class MenuView implements View {
     }
 
     @Override
-    public void keyPressed(KeyEvent arg0) {
-        
-    }
-
-    @Override
-    public void keyReleased(KeyEvent arg0) {
-        
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyPressed(KeyEvent e) {
         char character = e.getKeyChar();
         int code = e.getKeyCode();
         
@@ -150,6 +131,16 @@ public class MenuView implements View {
                 }
             }
         }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent arg0) {
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent arg0) {
+        
     }
 
 }
