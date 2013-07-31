@@ -1,36 +1,24 @@
 package org.lsfn.console_pc;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JPanel;
-
-import org.lsfn.console_pc.PilotingDisplay.DisplayState;
-import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.STS.STSup;
-
-public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
+public class LobbyView implements View {
 
     private Rectangle disconnectStarshipButton, nebulaConnectedBox, disconnectNebulaButton,
-            shipNameTextField, changeShipNameButton, readyIndicator, readyButton, shipsInGameList, 
-            nebulaDisconnectedBox, hostTextField, portTextField, connectButton;
+        shipNameTextField, changeShipNameButton, readyIndicator, readyButton, shipsInGameList, 
+        nebulaDisconnectedBox, hostTextField, portTextField, connectButton;
+
+    private String shipNameText, hostText, portText, previousShipName;
     
-    private String shipNameText, hostText, portText;
-    private boolean connectedToNebula, ready;
-    private List<String> shipsInGame;
+    private DataManager dataManager;
+    private ViewManager viewManager;
     
-    private PilotingDisplay pilotingDisplay;
-    
-    private enum LobbyPanelComponents {
+    private enum LobbyComponents {
         NONE,
         
         DISCONNECT_STARSHIP_BUTTON,
@@ -45,17 +33,16 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         PORT_TEXT_FIELD,
         CONNECT_BUTTON
     }
-    private LobbyPanelComponents lastComponentClicked;
+    private LobbyComponents lastComponentClicked;
     
-    public LobbyPanel(PilotingDisplay pilotingDisplay) {
-        this.pilotingDisplay = pilotingDisplay;
+    public LobbyView(ViewManager viewManager, DataManager dataManager) {
+        this.dataManager = dataManager;
+        this.viewManager = viewManager;
         
-        this.shipNameText = "Mungle Box";
         this.hostText = "localhost";
         this.portText = "39461";
-        this.connectedToNebula = false;
-        this.ready = false;
-        this.shipsInGame = new ArrayList<String>();
+        this.shipNameText = "Mungle Box";
+        this.previousShipName = "Mungle Box";
         
         this.disconnectStarshipButton = new Rectangle(10, 10, 200, 30);
         
@@ -71,23 +58,17 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         this.hostTextField = new Rectangle(230, 20, 200, 30);
         this.portTextField = new Rectangle(230, 60, 200, 30);
         this.connectButton = new Rectangle(230, 100, 200, 30);
-        
-        this.addMouseListener(this);
     }
     
-    private void paintCalibration(Graphics g) {
-        int squareSize = 10;
-        Rectangle bounds = this.getBounds();
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, squareSize, squareSize);
-        g.fillRect(bounds.width - squareSize - 1, 0, squareSize, squareSize);
-        g.fillRect(0, bounds.height - squareSize - 1, squareSize, squareSize);
-        g.fillRect(bounds.width - squareSize - 1, bounds.height - squareSize - 1, squareSize, squareSize);
-        g.setColor(Color.RED);
-        g.drawRect(0, 0, squareSize, squareSize);
-        g.drawRect(bounds.width - squareSize - 1, 0, squareSize, squareSize);
-        g.drawRect(0, bounds.height - squareSize - 1, squareSize, squareSize);
-        g.drawRect(bounds.width - squareSize - 1, bounds.height - squareSize - 1, squareSize, squareSize);
+    @Override
+    public void drawView(Graphics2D g, Rectangle bounds) {
+        clearPanel(g, bounds);
+        paintDisconnectStarshipButton(g);
+        if(this.dataManager.isConnectionConnected()) {
+            paintStarshipConnectedBox(g);
+        } else {
+            paintStarshipDisconnectedBox(g);
+        }
     }
     
     private void paintDisconnectStarshipButton(Graphics2D g2d) {
@@ -107,8 +88,12 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     private void paintShipNameTextField(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
         g2d.fill(shipNameTextField);
+        if(!this.dataManager.getLobbyShipName().equals(this.previousShipName)) {
+            this.previousShipName = this.dataManager.getLobbyShipName();
+            this.shipNameText = this.dataManager.getLobbyShipName();
+        }
         g2d.setColor(Color.WHITE);
-        g2d.drawString(this.shipNameText, shipNameTextField.x + 10, shipNameTextField.y + 10);
+        g2d.drawString(shipNameText, shipNameTextField.x + 10, shipNameTextField.y + 10);
     }
     
     private void paintChangeShipNameButton(Graphics2D g2d) {
@@ -121,13 +106,13 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
     private void paintReadyIndicator(Graphics2D g2d) {
         g2d.setColor(Color.GRAY);
         g2d.fill(readyIndicator);
-        if(ready) {
+        if(this.dataManager.getLobbyReadyState()) {
             g2d.setColor(Color.DARK_GRAY);
         } else {
             g2d.setColor(Color.RED);
         }
         g2d.fillOval(readyIndicator.x + 5, readyIndicator.y + 5, 20, 20);
-        if(ready) {
+        if(this.dataManager.getLobbyReadyState()) {
             g2d.setColor(Color.GREEN);
         } else {
             g2d.setColor(Color.DARK_GRAY);
@@ -146,6 +131,7 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         g2d.setColor(Color.CYAN);
         g2d.fill(shipsInGameList);
         g2d.setColor(Color.BLACK);
+        List<String> shipsInGame = this.dataManager.getLobbyShipsInGame();
         for(int i = 0; i < shipsInGame.size(); i++) {
             g2d.drawString(shipsInGame.get(i), shipsInGameList.x + 10, shipsInGameList.y + 10 + (i * 15));
         }
@@ -191,70 +177,17 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
         paintConnectButton(g2d);
     }
     
-    private void paintElements(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        paintDisconnectStarshipButton(g2d);
-        if(this.connectedToNebula) {
-            paintStarshipConnectedBox(g2d);
-        } else {
-            paintStarshipDisconnectedBox(g2d);
-        }
-    }
-    
-    private void clearPanel(Graphics g) {
-        Rectangle bounds = this.getBounds();
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE);
-        g2d.fill(bounds);
+    private void clearPanel(Graphics2D g, Rectangle bounds) {
+        g.setColor(Color.WHITE);
+        g.fill(bounds);
     }
     
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponents(g);
-        clearPanel(g);
-        //paintCalibration(g);
-        paintElements(g);
-    }
-    
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(1280, 1024);
-    }
-
-    public void processConnection(STSdown.Connection connection) {
-        if(connection.hasConnected()) {
-            this.connectedToNebula = connection.getConnected();
-        }
-    }
-    
-    public void processLobby(STSdown.Lobby lobby) {
-        if(lobby.hasReadyState()) {
-            this.ready = lobby.getReadyState();
-        }
-        // This one is confusing:
-        // lobby.hasGameStarted() returns true if the message contains information
-        // on whether the game has started or not and does not represent whether
-        // the game has actually started.
-        // if there is information on whether the game has started, lobby.getGameStarted()
-        // gets this information. Thus the && statement is only true if the game has
-        // actually started. 
-        if(lobby.hasGameStarted() && lobby.getGameStarted()) {
-            this.pilotingDisplay.changeDisplayState(DisplayState.PILOTING);
-        }
-        if(lobby.hasShipName()) {
-            this.shipNameText = lobby.getShipName();
-        }
-        if(lobby.getShipsInGameCount() > 0) {
-            this.shipsInGame = lobby.getShipsInGameList();
-        }
-    }
-    
-    @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyTyped(KeyEvent e) {
         char character = e.getKeyChar();
         int code = e.getKeyCode();
         
-        if(this.lastComponentClicked == LobbyPanelComponents.SHIP_NAME_TEXT_FIELD) {
+        if(this.lastComponentClicked == LobbyComponents.SHIP_NAME_TEXT_FIELD) {
             // The range of characters from ' ' through to '~' is the set of printable ascii characters 
             if((int)character >= (int)' ' && (int)character <= (int)'~') {
                 this.shipNameText = this.shipNameText + character;
@@ -263,7 +196,7 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
                     this.shipNameText = this.shipNameText.substring(0, this.shipNameText.length() - 1);
                 }
             }
-        } else if (this.lastComponentClicked == LobbyPanelComponents.HOST_TEXT_FIELD) {
+        } else if (this.lastComponentClicked == LobbyComponents.HOST_TEXT_FIELD) {
             // The character space of ' ' through '~' is the set of printable characters 
             if((int)character >= (int)' ' && (int)character <= (int)'~') {
                 this.hostText = this.hostText + character;
@@ -272,7 +205,7 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
                     this.hostText = this.hostText.substring(0, this.hostText.length() - 1);
                 }
             }
-        } else if(this.lastComponentClicked == LobbyPanelComponents.PORT_TEXT_FIELD) {
+        } else if(this.lastComponentClicked == LobbyComponents.PORT_TEXT_FIELD) {
             // This covers just the decimal digits
             if((int)character >= (int)'0' && (int)character <= (int)'9') {
                 this.portText = this.portText + character;
@@ -282,107 +215,71 @@ public class LobbyPanel extends JPanel implements MouseListener, KeyListener {
                 }
             }
         }
-         
+
+    }
+    
+    @Override
+    public void keyPressed(KeyEvent arg0) {
+
     }
 
     @Override
     public void keyReleased(KeyEvent arg0) {
-        
-    }
 
-    @Override
-    public void keyTyped(KeyEvent arg0) {
-        
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(this.connectedToNebula) {
+        if(this.dataManager.isConnectionConnected()) {
             if(this.disconnectNebulaButton.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.DISCONNECT_NEBULA_BUTTON;
-                sendDisconnectMessage();
+                this.lastComponentClicked = LobbyComponents.DISCONNECT_NEBULA_BUTTON;
+                this.dataManager.disconnectFromNebula();
             } else if(this.shipNameTextField.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.SHIP_NAME_TEXT_FIELD;
+                this.lastComponentClicked = LobbyComponents.SHIP_NAME_TEXT_FIELD;
             } else if(this.changeShipNameButton.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.CHANGE_SHIP_NAME_BUTTON;
-                sendChangeShipNameMessage();
+                this.lastComponentClicked = LobbyComponents.CHANGE_SHIP_NAME_BUTTON;
+                this.dataManager.setDesiredShipName(shipNameText);
             } else if(this.readyIndicator.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.READY_INDICATOR;
+                this.lastComponentClicked = LobbyComponents.READY_INDICATOR;
             } else if(this.readyButton.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.READY_BUTTON;
-                this.ready = !this.ready;
-                sendReadyStateMessage();
+                this.lastComponentClicked = LobbyComponents.READY_BUTTON;
+                this.dataManager.setDesiredReadyState(!this.dataManager.getLobbyReadyState());
             } else if(this.shipsInGameList.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.SHIPS_IN_GAME_LIST;
+                this.lastComponentClicked = LobbyComponents.SHIPS_IN_GAME_LIST;
             } else {
-                this.lastComponentClicked = LobbyPanelComponents.NONE;
+                this.lastComponentClicked = LobbyComponents.NONE;
             }
         } else {
             if(this.hostTextField.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.HOST_TEXT_FIELD;
+                this.lastComponentClicked = LobbyComponents.HOST_TEXT_FIELD;
             } else if(this.portTextField.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.PORT_TEXT_FIELD;
+                this.lastComponentClicked = LobbyComponents.PORT_TEXT_FIELD;
             } else if(this.connectButton.contains(e.getPoint())) {
-                this.lastComponentClicked = LobbyPanelComponents.CONNECT_BUTTON;
-                sendConnectMessage();
+                this.lastComponentClicked = LobbyComponents.CONNECT_BUTTON;
+                this.dataManager.connectToNebula(hostText, Integer.parseInt(portText));
             } else {
-                this.lastComponentClicked = LobbyPanelComponents.NONE;
+                this.lastComponentClicked = LobbyComponents.NONE;
             }
         }
     }
 
     @Override
     public void mouseEntered(MouseEvent arg0) {
-        
+
     }
 
     @Override
     public void mouseExited(MouseEvent arg0) {
-        
+
     }
 
     @Override
     public void mousePressed(MouseEvent arg0) {
-        
+
     }
 
     @Override
     public void mouseReleased(MouseEvent arg0) {
-        
-    }
-    
-    private void sendConnectMessage() {
-        System.out.println("Sending connection message.");
-        STSup.Builder stsUp = STSup.newBuilder();
-        STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
-        stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);
-        stsUpConnection.setHost(hostText);
-        stsUpConnection.setPort(Integer.parseInt(portText));
-        stsUp.setConnection(stsUpConnection);
-        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());
-    }
-    
-    private void sendDisconnectMessage() {
-        STSup.Builder stsUp = STSup.newBuilder();
-        STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
-        stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.DISCONNECT);
-        stsUp.setConnection(stsUpConnection);
-        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());
-    }
-    
-    private void sendChangeShipNameMessage() {
-        STSup.Builder stsUp = STSup.newBuilder();
-        STSup.Lobby.Builder stsUpLobby = STSup.Lobby.newBuilder();
-        stsUpLobby.setShipName(this.shipNameText);
-        stsUp.setLobby(stsUpLobby);
-        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());        
-    }
-    
-    private void sendReadyStateMessage() {
-        STSup.Builder stsUp = STSup.newBuilder();
-        STSup.Lobby.Builder stsUpLobby = STSup.Lobby.newBuilder();
-        stsUpLobby.setReadyState(this.ready);
-        stsUp.setLobby(stsUpLobby);
-        this.pilotingDisplay.getConsolePC().getStarshipConnection().sendMessageToStarship(stsUp.build());
+
     }
 }
