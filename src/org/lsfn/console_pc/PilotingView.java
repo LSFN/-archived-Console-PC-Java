@@ -13,10 +13,12 @@ public class PilotingView implements View {
     // TODO zoom
     private static int scale = 10;
     
-    private DataManager dataManager;
+    private PilotingData pilotingData;
+    private VisualSensorsData visualSensorsData;
     
-    public PilotingView(DataManager dataManager) {
-        this.dataManager = dataManager;
+    public PilotingView(PilotingData pilotingData, VisualSensorsData visualSensorsData) {
+        this.pilotingData = pilotingData;
+        this.visualSensorsData = visualSensorsData;
     }
     
     private void paintCalibration(Graphics2D g, Rectangle bounds) {
@@ -45,7 +47,7 @@ public class PilotingView implements View {
     }
     
     private void paintObjects(Graphics2D g, Rectangle bounds) {
-        for(SpaceObject so : this.dataManager.getVisualSensorsSpaceObjects()) {
+        for(SpaceObject so : this.visualSensorsData.getVisualSensorsSpaceObjects()) {
             if(so.getObjectType() == ObjectType.SHIP) {
                 int[] xs = new int[3];
                 int[] ys = new int[3];
@@ -103,34 +105,34 @@ public class PilotingView implements View {
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_Q) {
-            this.dataManager.setTurnAnti(true);
+            this.pilotingData.setTurnAnti(true);
         } else if(e.getKeyCode() == KeyEvent.VK_E) {
-            this.dataManager.setTurnClock(true);
+            this.pilotingData.setTurnClock(true);
         } else if(e.getKeyCode() == KeyEvent.VK_A) {
-            this.dataManager.setThrustLeft(true);
+            this.pilotingData.setThrustLeft(true);
         } else if(e.getKeyCode() == KeyEvent.VK_D) {
-            this.dataManager.setThrustRight(true);
+            this.pilotingData.setThrustRight(true);
         } else if(e.getKeyCode() == KeyEvent.VK_W) {
-            this.dataManager.setThrustForward(true);
+            this.pilotingData.setThrustForward(true);
         } else if(e.getKeyCode() == KeyEvent.VK_S) {
-            this.dataManager.setThrustBackward(true);
+            this.pilotingData.setThrustBackward(true);
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_Q) {
-            this.dataManager.setTurnAnti(false);
+            this.pilotingData.setTurnAnti(false);
         } else if(e.getKeyCode() == KeyEvent.VK_E) {
-            this.dataManager.setTurnClock(false);
+            this.pilotingData.setTurnClock(false);
         } else if(e.getKeyCode() == KeyEvent.VK_A) {
-            this.dataManager.setThrustLeft(false);
+            this.pilotingData.setThrustLeft(false);
         } else if(e.getKeyCode() == KeyEvent.VK_D) {
-            this.dataManager.setThrustRight(false);
+            this.pilotingData.setThrustRight(false);
         } else if(e.getKeyCode() == KeyEvent.VK_W) {
-            this.dataManager.setThrustForward(false);
+            this.pilotingData.setThrustForward(false);
         } else if(e.getKeyCode() == KeyEvent.VK_S) {
-            this.dataManager.setThrustBackward(false);
+            this.pilotingData.setThrustBackward(false);
         }
     }
 

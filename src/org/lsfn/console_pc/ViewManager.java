@@ -24,14 +24,11 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
         PILOTING
     }
     private ViewState currentView;
-    private ViewState nextView;
-    
     
     public ViewManager() {
         this.viewThread = new Thread(this);
         this.dataManager = new DataManager();
         this.currentView = ViewState.MENU;
-        this.nextView = ViewState.MENU;
         this.view = new MenuView(this.dataManager);
         this.addMouseListener(this.view);
     }
@@ -40,9 +37,6 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
         this.viewThread.start();
     }
     
-    public void changeView(ViewState nextView) {
-        this.nextView = nextView;
-    }
     
     @Override
     protected void paintComponent(Graphics g) {
@@ -71,14 +65,14 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
     
     private void changeToLobby() {
         this.removeMouseListener(this.view);
-        this.view = new LobbyView(this.dataManager);
+        this.view = new LobbyView(this.dataManager.getConnectionData(), this.dataManager.getLobbyData());
         this.addMouseListener(this.view);
         this.currentView = ViewState.LOBBY;
     }
     
     private void changeToPiloting() {
         this.removeMouseListener(this.view);
-        this.view = new PilotingView(this.dataManager);
+        this.view = new PilotingView(this.dataManager.getPilotingData(), this.dataManager.getVisualSensorsData());
         this.addMouseListener(this.view);
         this.currentView = ViewState.PILOTING;
     }
@@ -97,7 +91,7 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
         } else if(this.currentView == ViewState.LOBBY) {
             if(!this.dataManager.isConnectedToStarship()) {
                 changeToMenu();
-            } else if(this.dataManager.isLobbyGameStarted()) {
+            } else if(this.dataManager.getLobbyData().getLobbyGameStarted()) {
                 changeToPiloting();
             }
         }

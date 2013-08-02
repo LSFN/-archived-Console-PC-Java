@@ -15,7 +15,8 @@ public class LobbyView implements View {
 
     private String shipNameText, hostText, portText, previousShipName;
     
-    private DataManager dataManager;
+    private ConnectionData connectionData;
+    private LobbyData lobbyData;
     
     private enum LobbyComponents {
         NONE,
@@ -34,8 +35,9 @@ public class LobbyView implements View {
     }
     private LobbyComponents lastComponentClicked;
     
-    public LobbyView(DataManager dataManager) {
-        this.dataManager = dataManager;
+    public LobbyView(ConnectionData connectionData, LobbyData lobbyData) {
+        this.connectionData = connectionData;
+        this.lobbyData = lobbyData;
         
         this.hostText = "localhost";
         this.portText = "39461";
@@ -64,7 +66,7 @@ public class LobbyView implements View {
     public void drawView(Graphics2D g, Rectangle bounds) {
         clearPanel(g, bounds);
         paintDisconnectStarshipButton(g);
-        if(this.dataManager.isConnectionConnected()) {
+        if(this.connectionData.getConnectedToNebula()) {
             paintStarshipConnectedBox(g);
         } else {
             paintStarshipDisconnectedBox(g);
@@ -88,9 +90,10 @@ public class LobbyView implements View {
     private void paintShipNameTextField(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
         g2d.fill(shipNameTextField);
-        if(!this.dataManager.getLobbyShipName().equals(this.previousShipName)) {
-            this.previousShipName = this.dataManager.getLobbyShipName();
-            this.shipNameText = this.dataManager.getLobbyShipName();
+        String receivedShipName = this.lobbyData.getLobbyShipName();
+        if(!receivedShipName.equals(this.previousShipName)) {
+            this.previousShipName = receivedShipName;
+            this.shipNameText = receivedShipName;
         }
         g2d.setColor(Color.WHITE);
         g2d.drawString(shipNameText, shipNameTextField.x + 10, shipNameTextField.y + 10);
@@ -106,13 +109,13 @@ public class LobbyView implements View {
     private void paintReadyIndicator(Graphics2D g2d) {
         g2d.setColor(Color.GRAY);
         g2d.fill(readyIndicator);
-        if(this.dataManager.getLobbyReadyState()) {
+        if(this.lobbyData.getLobbyReadyState()) {
             g2d.setColor(Color.DARK_GRAY);
         } else {
             g2d.setColor(Color.RED);
         }
         g2d.fillOval(readyIndicator.x + 5, readyIndicator.y + 5, 20, 20);
-        if(this.dataManager.getLobbyReadyState()) {
+        if(this.lobbyData.getLobbyReadyState()) {
             g2d.setColor(Color.GREEN);
         } else {
             g2d.setColor(Color.DARK_GRAY);
@@ -131,7 +134,7 @@ public class LobbyView implements View {
         g2d.setColor(Color.CYAN);
         g2d.fill(shipsInGameList);
         g2d.setColor(Color.BLACK);
-        List<String> shipsInGame = this.dataManager.getLobbyShipsInGame();
+        List<String> shipsInGame = this.lobbyData.getLobbyShipsInGame();
         for(int i = 0; i < shipsInGame.size(); i++) {
             g2d.drawString(shipsInGame.get(i), shipsInGameList.x + 10, shipsInGameList.y + 10 + (i * 15));
         }
@@ -229,20 +232,20 @@ public class LobbyView implements View {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(this.dataManager.isConnectionConnected()) {
+        if(this.connectionData.getConnectedToNebula()) {
             if(this.disconnectNebulaButton.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.DISCONNECT_NEBULA_BUTTON;
-                this.dataManager.disconnectFromNebula();
+                this.connectionData.disconnectFromNebula();
             } else if(this.shipNameTextField.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.SHIP_NAME_TEXT_FIELD;
             } else if(this.changeShipNameButton.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.CHANGE_SHIP_NAME_BUTTON;
-                this.dataManager.setDesiredShipName(shipNameText);
+                this.lobbyData.setShipName(shipNameText);
             } else if(this.readyIndicator.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.READY_INDICATOR;
             } else if(this.readyButton.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.READY_BUTTON;
-                this.dataManager.setDesiredReadyState(!this.dataManager.getLobbyReadyState());
+                this.lobbyData.setReadyState(!this.lobbyData.getLobbyReadyState());
             } else if(this.shipsInGameList.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.SHIPS_IN_GAME_LIST;
             } else {
@@ -255,7 +258,7 @@ public class LobbyView implements View {
                 this.lastComponentClicked = LobbyComponents.PORT_TEXT_FIELD;
             } else if(this.connectButton.contains(e.getPoint())) {
                 this.lastComponentClicked = LobbyComponents.CONNECT_BUTTON;
-                this.dataManager.connectToNebula(hostText, Integer.parseInt(portText));
+                this.connectionData.connectToNebula(hostText, Integer.parseInt(portText));
             } else {
                 this.lastComponentClicked = LobbyComponents.NONE;
             }
