@@ -38,6 +38,9 @@ public class DataManager {
     private boolean[] desiredCommandStates;
     private boolean[] desiredCommandStatesChanged;
     
+    // Horrible hack
+    private boolean enteredShipDesigner;
+    
     public DataManager() {
         this.starshipConnection = new StarshipConnection();
         
@@ -182,6 +185,14 @@ public class DataManager {
         return connectionConnected;
     }
 
+    public boolean getEnteredShipDesigner() {
+        return enteredShipDesigner;
+    }
+    
+    public void setEnteredShipDesigner(boolean state) {
+        enteredShipDesigner = state;
+    }
+    
     public boolean getLobbyReadyState() {
         return lobbyReadyState;
     }

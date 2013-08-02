@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 public class MenuView implements View {
     
     private String hostText, portText;
-    private Rectangle hostTextField, portTextField, connectButton, exitButton;
+    private Rectangle hostTextField, portTextField, connectButton, exitButton, shipDesignerButton;
     private DataManager dataManager;
     
     private enum MenuComponents {
@@ -17,11 +17,12 @@ public class MenuView implements View {
         HOST_TEXT_FIELD,
         PORT_TEXT_FIELD,
         CONNECT_BUTTON,
-        EXIT_BUTTON        
+        EXIT_BUTTON,
+        SHIP_DESIGNER_BUTTON
     }
     private MenuComponents lastComponentClicked;
     
-    public MenuView( DataManager dataManager) {
+    public MenuView(DataManager dataManager) {
         this.dataManager = dataManager;
         this.lastComponentClicked = MenuComponents.NONE;
         this.hostText = "localhost";
@@ -31,6 +32,7 @@ public class MenuView implements View {
         this.portTextField = new Rectangle(120, 10, 100, 30);
         this.connectButton = new Rectangle(10, 50, 100, 30);
         this.exitButton = new Rectangle(120, 50, 100, 30);
+        this.shipDesignerButton = new Rectangle(10, 90, 100,  30);
     }
     
     @Override
@@ -43,11 +45,13 @@ public class MenuView implements View {
         g.setColor(Color.BLUE);
         g.fill(connectButton);
         g.fill(exitButton);
+        g.fill(shipDesignerButton);
         g.setColor(Color.WHITE);
         g.drawString(hostText, this.hostTextField.x + 10, this.hostTextField.y + 20);
         g.drawString(portText, this.portTextField.x + 10, this.portTextField.y + 20);
         g.drawString("connect", this.connectButton.x + 10, this.connectButton.y + 20);
         g.drawString("exit", this.exitButton.x + 10, this.exitButton.y + 20);
+        g.drawString("ship designer", this.shipDesignerButton.x + 10, this.shipDesignerButton.y + 20);
     }
 
     private void clearPanel(Graphics2D g, Rectangle bounds) {
@@ -82,6 +86,9 @@ public class MenuView implements View {
         } else if(this.exitButton.contains(e.getPoint())) {
             System.out.println("exit button clicked");
             this.lastComponentClicked = MenuComponents.EXIT_BUTTON;
+        } else if(this.shipDesignerButton.contains(e.getPoint())) {
+            this.lastComponentClicked = MenuComponents.SHIP_DESIGNER_BUTTON;
+            this.dataManager.setEnteredShipDesigner(true);
         } else {
             this.lastComponentClicked = MenuComponents.NONE;
         }

@@ -19,6 +19,7 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
     
     public enum ViewState {
         MENU,
+        SHIP_DESIGNER,
         LOBBY,
         PILOTING
     }
@@ -61,6 +62,13 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
         this.currentView = ViewState.MENU;
     }
     
+    private void changeToShipDesigner() {
+        this.removeMouseListener(this.view);
+        this.view = new ShipDesignerView(this, this.dataManager);
+        this.addMouseListener(this.view);
+        this.currentView = ViewState.SHIP_DESIGNER;
+    }
+    
     private void changeToLobby() {
         this.removeMouseListener(this.view);
         this.view = new LobbyView(this.dataManager);
@@ -79,6 +87,12 @@ public class ViewManager extends JPanel implements Runnable, KeyListener {
         if(this.currentView == ViewState.MENU) {
             if(this.dataManager.isConnectedToStarship()) {
                 changeToLobby();
+            } else if(this.dataManager.getEnteredShipDesigner()) {
+                changeToShipDesigner();
+            }
+        } else if(this.currentView == ViewState.SHIP_DESIGNER) {
+            if(!this.dataManager.getEnteredShipDesigner()) {
+                changeToMenu();
             }
         } else if(this.currentView == ViewState.LOBBY) {
             if(!this.dataManager.isConnectedToStarship()) {
