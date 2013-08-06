@@ -16,7 +16,7 @@ import javax.swing.JFileChooser;
 public class ShipDesignerView implements View {
 
     private DataManager dataManager;
-    private ViewManager viewManager;
+    private ScreenManager viewManager;
     private JFileChooser fileDialog;
     private BufferedImage shipImage;
     
@@ -29,7 +29,7 @@ public class ShipDesignerView implements View {
     }
     private ShipDesignerComponents lastComponentClicked;
     
-    public ShipDesignerView(ViewManager viewManager, DataManager dataManager) {
+    public ShipDesignerView(ScreenManager viewManager, DataManager dataManager) {
         this.viewManager = viewManager;
         this.dataManager = dataManager;
         this.fileDialog = new JFileChooser();

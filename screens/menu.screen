@@ -1,0 +1,48 @@
+screenName: "Menu"
+widgetLayout {
+    name: "menu"
+    vertical: true
+    ratio: 1
+    spacing: 10
+    colour: "0xFFFFFF"
+    widgetLayout {
+        name: "host"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "localhost"
+        colour: "0x000000"
+    }
+    widgetLayout {
+        name: "port"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "39460"
+        colour: "0x000000"
+    }
+    widgetLayout {
+        name: "connect"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "connect"
+        colour: "0x0000FF"
+    }
+    widgetLayout {
+        name: "exit"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "exit"
+        colour: "0x0000FF"
+    }
+}
+outputLinks {
+    outputPath: "console/hostname"
+    widgetPath: "menu/hostfield"
+}
+inputLinks {
+    inputPath: "console/connect"
+    controlPath: "menu/connect/click"
+}

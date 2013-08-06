@@ -1,0 +1,31 @@
+option java_package = "org.lsfn.console_pc";
+option java_outer_classname = "ScreenFile";
+
+message ScreenConfig {
+
+    message WidgetLayout {
+        required string name = 1;
+        required bool vertical = 2;
+        required uint32 ratio = 3;
+        required uint32 spacing = 4;
+        repeated WidgetLayout widgetLayout = 5;
+        optional string text = 6;
+        optional string colour = 7; // RGB in hex format i.e. RRGGBB e.g. FF00AA
+    }
+    
+    message OutputLink {
+        required string outputPath = 1;
+        required string widgetPath = 2;
+    }
+    
+    message InputLink {
+        required string inputPath = 1;
+        required string controlPath = 2;
+    }
+    
+    required string screenName = 1;
+    required WidgetLayout widgetLayout = 2;
+    repeated OutputLink outputLinks = 3;
+    repeated InputLink inputLinks = 4;
+    
+}

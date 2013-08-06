@@ -6,9 +6,16 @@ import java.io.InputStreamReader;
 
 import javax.swing.JFrame;
 
+import org.lsfn.console_pc.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.ScreenFile.ScreenConfig.InputLink;
+import org.lsfn.console_pc.ScreenFile.ScreenConfig.OutputLink;
+import org.lsfn.console_pc.ScreenFile.ScreenConfig.WidgetLayout;
+
+import com.google.protobuf.TextFormat;
+
 public class ConsolePC extends JFrame {
 
-    private ViewManager viewManager;
+    private ScreenManager screenManager;
     private boolean keepGoing;
     
     public ConsolePC() {
@@ -19,9 +26,9 @@ public class ConsolePC extends JFrame {
         this.setSize(WIDTH, HEIGHT);
         this.setVisible(true);
         this.createBufferStrategy(2);
-        this.viewManager = new ViewManager();
-        this.add(this.viewManager);
-        this.addKeyListener(this.viewManager);
+        this.screenManager = new ScreenManager();
+        this.add(this.screenManager);
+        this.addKeyListener(this.screenManager);
         this.pack();
         
         this.keepGoing = true;
@@ -48,7 +55,7 @@ public class ConsolePC extends JFrame {
     public void run(String[] args) {
         printHelp();
         
-        this.viewManager.start();
+        this.screenManager.start();
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while(this.keepGoing) {
