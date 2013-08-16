@@ -6,16 +6,15 @@ import java.io.InputStreamReader;
 
 import javax.swing.JFrame;
 
-import org.lsfn.console_pc.ScreenFile.ScreenConfig;
-import org.lsfn.console_pc.ScreenFile.ScreenConfig.InputLink;
-import org.lsfn.console_pc.ScreenFile.ScreenConfig.OutputLink;
-import org.lsfn.console_pc.ScreenFile.ScreenConfig.WidgetLayout;
-
-import com.google.protobuf.TextFormat;
+import org.lsfn.console_pc.data_management.DataManager;
 
 public class ConsolePC extends JFrame {
 
-    private ScreenManager screenManager;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5344546375757215850L;
+    private DataManager dataManager;
     private boolean keepGoing;
     
     public ConsolePC() {
@@ -26,10 +25,10 @@ public class ConsolePC extends JFrame {
         this.setSize(WIDTH, HEIGHT);
         this.setVisible(true);
         this.createBufferStrategy(2);
-        this.screenManager = new ScreenManager();
-        this.add(this.screenManager);
-        this.addKeyListener(this.screenManager);
+        this.dataManager = new DataManager();
+        this.add(this.dataManager.getScreenManager());
         this.pack();
+        this.addKeyListener(this.dataManager.getInputManager());
         
         this.keepGoing = true;
     }
@@ -55,7 +54,7 @@ public class ConsolePC extends JFrame {
     public void run(String[] args) {
         printHelp();
         
-        this.screenManager.start();
+        this.dataManager.start();
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while(this.keepGoing) {

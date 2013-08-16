@@ -1,4 +1,4 @@
-package org.lsfn.console_pc;
+package org.lsfn.console_pc.screen_management;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lsfn.console_pc.ScreenFile.ScreenConfig;
-import org.lsfn.console_pc.ScreenFile.ScreenConfig.InputLink;
-import org.lsfn.console_pc.ScreenFile.ScreenConfig.OutputLink;
+import org.lsfn.console_pc.data_management.elements.DataSource;
+import org.lsfn.console_pc.input_management.Bindings;
+import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.InputLink;
+import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.OutputLink;
 
 import com.google.protobuf.TextFormat;
 
@@ -19,8 +21,8 @@ public class Screen {
     
     private String screenName;
     private Widget widget;
-    private Map<String, String> controlMapping;
-    private Map<String, String> widgetMapping;
+    private Map<String, Bindings> controlMapping;
+    private Map<String, ScreenOutputLink> widgetMapping;
     
     protected Screen() {
         
@@ -30,15 +32,15 @@ public class Screen {
         this.screenName = config.getScreenName();
         this.widget = new Widget(config.getWidgetLayout());
         if(config.getInputLinksCount() > 0) {
-            controlMapping = new HashMap<String, String>();
+            this.controlMapping = new HashMap<String, Bindings>();
             for(InputLink link : config.getInputLinksList()) {
-                controlMapping.put(link.getControlPath(), link.getInputPath());
+                this.controlMapping.put(link.getWidgetPath(), new Bindings(link));
             }
         }
         if(config.getOutputLinksCount() > 0) {
-            widgetMapping = new HashMap<String, String>();
+            this.widgetMapping = new HashMap<String, ScreenOutputLink>();
             for(OutputLink link : config.getOutputLinksList()) {
-                widgetMapping.put(link.getWidgetPath(), link.getOutputPath());
+                this.widgetMapping.put(link.getWidgetPath(), new ScreenOutputLink(link));
             }
         }
     }
@@ -76,7 +78,22 @@ public class Screen {
         this.widget.setBounds(bounds);
     }
     
-    public void getWidgetPath(Point p) {
-        this.widget.getWidgetPath(p);
+    public String getWidgetPath(Point p) {
+        return this.widget.getWidgetPath(p);
     }
+
+    public Map<String, Bindings> getControlMapping() {
+        return controlMapping;
+    }
+
+    public Map<String, ScreenOutputLink> getWidgetMapping() {
+        return widgetMapping;
+    }
+    
+    public void linkOutput(String path, DataSource dataSource) {
+        if(this.widget != null) {
+            this.widget.setWidgetData(path, dataSource);
+        }
+    }
+    
 }

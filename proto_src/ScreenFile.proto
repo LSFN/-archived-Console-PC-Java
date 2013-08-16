@@ -1,4 +1,4 @@
-option java_package = "org.lsfn.console_pc";
+option java_package = "org.lsfn.console_pc.screen_management";
 option java_outer_classname = "ScreenFile";
 
 message ScreenConfig {
@@ -19,8 +19,14 @@ message ScreenConfig {
     }
     
     message InputLink {
-        required string inputPath = 1;
-        required string controlPath = 2;
+        message Binding {
+            required string control = 1;
+            required string command = 2;
+        }
+
+        required string widgetPath = 1;
+        required string inputPath = 2;
+        repeated Binding bindings = 3;
     }
     
     required string screenName = 1;

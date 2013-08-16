@@ -1,4 +1,4 @@
-package org.lsfn.console_pc;
+package org.lsfn.console_pc.screen_management;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lsfn.console_pc.ScreenFile.ScreenConfig.WidgetLayout;
+import org.lsfn.console_pc.data_management.elements.DataSource;
+import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.WidgetLayout;
 
 import com.google.protobuf.TextFormat;
 
@@ -27,6 +28,7 @@ public class Widget {
     private Integer spacing;
     
     private Rectangle bounds;
+    private DataSource dataSource;
     
     public Widget(WidgetLayout layout) {
         this.verticalWidget = layout.getVertical();
@@ -52,6 +54,9 @@ public class Widget {
             this.subWidgets.add(widget);
             this.ratioSum += widget.getRatio();
         }
+        
+        this.bounds = null;
+        this.dataSource = null;
     }
     
     public boolean isVerticalWidget() {
@@ -130,14 +135,40 @@ public class Widget {
         return this.name;
     }
     
+    public void setWidgetData(String path, DataSource dataSource) {
+        if(this.name.equals(path)) {
+            this.dataSource = dataSource;
+        } else {
+            String cutPath = path.substring(this.name.length()+1);
+            // TODO make subwidgets a map
+            for(Widget subWidget : this.subWidgets) {
+                subWidget.setWidgetData(cutPath, dataSource);
+            }
+        }
+    }
+    
+    private void drawStringInWidget(Graphics2D g, String strToDraw) {
+        g.setColor(invertColour(this.colour));
+        Rectangle2D stringRect = g.getFontMetrics().getStringBounds(strToDraw, g);
+        g.drawString(strToDraw, (int)(bounds.getCenterX() - stringRect.getWidth()/2), (int)(bounds.getCenterY() - stringRect.getHeight()/2));
+    }
+    
     public void drawWidget(Graphics2D g) {
         // Draw this widget first
         g.setColor(this.colour);
         g.fill(bounds);
-        if(this.text != null) {
-            g.setColor(invertColour(this.colour));
-            Rectangle2D stringRect = g.getFontMetrics().getStringBounds(this.text, g);
-            g.drawString(this.text, (int)(bounds.getCenterX() - stringRect.getWidth()/2), (int)(bounds.getCenterY() - stringRect.getHeight()/2));
+        if(this.text != null && this.dataSource != null) {
+            // Draw whatever data we have linked
+            if(this.dataSource != null) {
+                Object data = this.dataSource.getData();
+                if(data.getClass() == String.class) {
+                    drawStringInWidget(g, (String)data);
+                } else if(data.getClass() == Integer.class) {
+                    drawStringInWidget(g, ((Integer)data).toString());
+                }
+            } else {
+                drawStringInWidget(g, this.text);
+            }
         }
         
         for(Widget widget : this.subWidgets) {

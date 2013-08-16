@@ -40,9 +40,25 @@ widgetLayout {
 }
 outputLinks {
     outputPath: "console/hostname"
-    widgetPath: "menu/hostfield"
+    widgetPath: "menu/host"
 }
 inputLinks {
+    widgetPath: "menu/connect"
     inputPath: "console/connect"
-    controlPath: "menu/connect/click"
+}
+inputLinks {
+    widgetPath: "menu/host"
+    inputPath: "console/hostname"
+    Binding {
+        control: "PRINTABLE_CHARS"
+        command: "typing"
+    }
+}
+inputLinks {
+    widgetPath: "menu/port"
+    inputPath: "console/port"
+    Binding {
+        control: "DECIMAL_DIGITS"
+        command: "typing"
+    }
 }
