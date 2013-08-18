@@ -6,12 +6,10 @@ public class ScreenOutputLink {
 
     private String widgetPath;
     private String dataPath;
-    private String type;
     
     public ScreenOutputLink(OutputLink link) {
         this.widgetPath = link.getWidgetPath();
-        this.dataPath = link.getOutputPath();
-        this.type = link.getType();
+        this.dataPath = link.getDataPath();
     }
 
     public String getWidgetPath() {
@@ -20,10 +18,6 @@ public class ScreenOutputLink {
 
     public String getDataPath() {
         return dataPath;
-    }
-
-    public String getType() {
-        return type;
     }
 
 }

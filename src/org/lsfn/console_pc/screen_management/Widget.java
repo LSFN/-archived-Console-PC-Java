@@ -8,8 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.WidgetLayout;
@@ -20,7 +20,7 @@ public class Widget {
 
     private String name;
     private boolean verticalWidget;
-    private List<Widget> subWidgets;
+    private Map<String, Widget> subWidgets;
     private Integer ratio;
     private Integer ratioSum;
     private Color colour;
@@ -31,6 +31,7 @@ public class Widget {
     private DataSource dataSource;
     
     public Widget(WidgetLayout layout) {
+        this.name = layout.getName();
         this.verticalWidget = layout.getVertical();
         this.ratio = layout.getRatio();
         this.spacing = layout.getSpacing();
@@ -47,11 +48,11 @@ public class Widget {
             this.colour = Color.BLACK;
         }
         
-        this.subWidgets = new ArrayList<Widget>();
+        this.subWidgets = new HashMap<String, Widget>();
         this.ratioSum = 0;
         for(WidgetLayout subLayout : layout.getWidgetLayoutList()) {
             Widget widget = new Widget(subLayout);
-            this.subWidgets.add(widget);
+            this.subWidgets.put(widget.name, widget);
             this.ratioSum += widget.getRatio();
         }
         
@@ -67,7 +68,7 @@ public class Widget {
         return ratio;
     }
     
-    public List<Widget> getSubWidgets() {
+    public Map<String, Widget> getSubWidgets() {
         return subWidgets;
     }
 
@@ -102,7 +103,7 @@ public class Widget {
             
             int y = (int)bounds.getY() + this.spacing;
             double baseHeight = (bounds.getHeight() - this.spacing) / this.ratioSum;
-            for(Widget widget : this.subWidgets) {
+            for(Widget widget : this.subWidgets.values()) {
                 double rectangleTopDifference = widget.getRatio() * baseHeight;
                 int height = (int)(rectangleTopDifference - this.spacing);
                 Rectangle subWidgetBounds = new Rectangle(x, y, width, height);
@@ -116,7 +117,7 @@ public class Widget {
             
             int x = (int)bounds.getX() + this.spacing;
             double baseWidth = (bounds.getWidth() - this.spacing) / this.ratioSum;
-            for(Widget widget : this.subWidgets) {
+            for(Widget widget : this.subWidgets.values()) {
                 double rectangleLeftDifference = widget.getRatio() * baseWidth;
                 int width = (int)(rectangleLeftDifference - this.spacing);
                 Rectangle subWidgetBounds = new Rectangle(x, y, width, height);
@@ -127,7 +128,7 @@ public class Widget {
     }
     
     public String getWidgetPath(Point p) {
-        for(Widget widget : subWidgets) {
+        for(Widget widget : subWidgets.values()) {
             if(widget.getBounds().contains(p)) {
                 return this.name + "/" + widget.getWidgetPath(p);
             }
@@ -140,9 +141,10 @@ public class Widget {
             this.dataSource = dataSource;
         } else {
             String cutPath = path.substring(this.name.length()+1);
-            // TODO make subwidgets a map
-            for(Widget subWidget : this.subWidgets) {
-                subWidget.setWidgetData(cutPath, dataSource);
+            for(String widgetName : this.subWidgets.keySet()) {
+                if(cutPath.startsWith(widgetName)) {
+                    this.subWidgets.get(widgetName).setWidgetData(cutPath, dataSource);
+                }
             }
         }
     }
@@ -157,21 +159,22 @@ public class Widget {
         // Draw this widget first
         g.setColor(this.colour);
         g.fill(bounds);
-        if(this.text != null && this.dataSource != null) {
+        if(this.text != null) {
+            drawStringInWidget(g, this.text);
+        }
+        
+        if(this.dataSource != null) {
             // Draw whatever data we have linked
-            if(this.dataSource != null) {
-                Object data = this.dataSource.getData();
-                if(data.getClass() == String.class) {
-                    drawStringInWidget(g, (String)data);
-                } else if(data.getClass() == Integer.class) {
-                    drawStringInWidget(g, ((Integer)data).toString());
-                }
-            } else {
-                drawStringInWidget(g, this.text);
+            Object data = this.dataSource.getData();
+            if(data.getClass() == String.class) {
+                drawStringInWidget(g, (String)data);
+            } else if(data.getClass() == Integer.class) {
+                drawStringInWidget(g, ((Integer)data).toString());
             }
         }
         
-        for(Widget widget : this.subWidgets) {
+        // Draw all the sub-widgets
+        for(Widget widget : this.subWidgets.values()) {
             widget.drawWidget(g);
         }
     }

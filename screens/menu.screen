@@ -10,7 +10,6 @@ widgetLayout {
         vertical: false
         ratio: 1
         spacing: 10
-        text: "localhost"
         colour: "0x000000"
     }
     widgetLayout {
@@ -18,7 +17,6 @@ widgetLayout {
         vertical: false
         ratio: 1
         spacing: 10
-        text: "39460"
         colour: "0x000000"
     }
     widgetLayout {
@@ -39,26 +37,22 @@ widgetLayout {
     }
 }
 outputLinks {
-    outputPath: "console/hostname"
+    dataPath: "console/hostname"
     widgetPath: "menu/host"
 }
-inputLinks {
-    widgetPath: "menu/connect"
-    inputPath: "console/connect"
-}
-inputLinks {
-    widgetPath: "menu/host"
-    inputPath: "console/hostname"
-    Binding {
-        control: "PRINTABLE_CHARS"
-        command: "typing"
-    }
-}
-inputLinks {
+outputLinks {
+    dataPath: "console/port"
     widgetPath: "menu/port"
-    inputPath: "console/port"
-    Binding {
-        control: "DECIMAL_DIGITS"
-        command: "typing"
-    }
+}
+inputLinks {
+    dataPath: "console/connect"
+    widgetPath: "menu/connect"
+}
+inputLinks {
+    dataPath: "console/hostname"
+    widgetPath: "menu/host"
+}
+inputLinks {
+    dataPath: "console/port"
+    widgetPath: "menu/port"
 }

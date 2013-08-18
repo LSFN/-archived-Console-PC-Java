@@ -60,7 +60,7 @@ public class TypeableInteger implements ControlledData, DataSource {
     }
 
     @Override
-    public Object getData() {
+    public Integer getData() {
         return data;
     }
 

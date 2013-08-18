@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.lsfn.console_pc.data_management.elements.DataSource;
-import org.lsfn.console_pc.input_management.Bindings;
+import org.lsfn.console_pc.input_management.ControlInputLink;
 import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig;
 import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.InputLink;
 import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.OutputLink;
@@ -21,7 +21,7 @@ public class Screen {
     
     private String screenName;
     private Widget widget;
-    private Map<String, Bindings> controlMapping;
+    private Map<String, ControlInputLink> controlMapping;
     private Map<String, ScreenOutputLink> widgetMapping;
     
     protected Screen() {
@@ -32,9 +32,9 @@ public class Screen {
         this.screenName = config.getScreenName();
         this.widget = new Widget(config.getWidgetLayout());
         if(config.getInputLinksCount() > 0) {
-            this.controlMapping = new HashMap<String, Bindings>();
+            this.controlMapping = new HashMap<String, ControlInputLink>();
             for(InputLink link : config.getInputLinksList()) {
-                this.controlMapping.put(link.getWidgetPath(), new Bindings(link));
+                this.controlMapping.put(link.getWidgetPath(), new ControlInputLink(link));
             }
         }
         if(config.getOutputLinksCount() > 0) {
@@ -82,7 +82,7 @@ public class Screen {
         return this.widget.getWidgetPath(p);
     }
 
-    public Map<String, Bindings> getControlMapping() {
+    public Map<String, ControlInputLink> getControlMapping() {
         return controlMapping;
     }
 

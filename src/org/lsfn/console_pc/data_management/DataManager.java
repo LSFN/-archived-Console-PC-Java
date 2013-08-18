@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
-import org.lsfn.console_pc.StarshipConnection;
+import org.lsfn.console_pc.data_management.elements.ControlledData;
 import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.input_management.InputManager;
 import org.lsfn.console_pc.screen_management.Screen;
@@ -26,9 +26,10 @@ public class DataManager extends Thread {
     private InputManager inputManager;
     private ScreenManager screenManager;
     
-    private StarshipConnection starshipConnection;
+    //private StarshipConnection starshipConnection;
     
-    private ConsoleData consoleData;
+    //private ConsoleData consoleData;
+    private StarshipConnectionData starshipConnectionData;
     private ConnectionData connectionData;
     private LobbyData lobbyData;
     private PilotingData pilotingData;
@@ -39,10 +40,12 @@ public class DataManager extends Thread {
     public DataManager() {
         this.inputManager = new InputManager(this);
         this.screenManager = new ScreenManager();
+        this.screenManager.addMouseListener(this.inputManager);
         
-        this.starshipConnection = new StarshipConnection();
+        //this.starshipConnection = new StarshipConnection();
         
-        this.consoleData = new ConsoleData();
+        //this.consoleData = new ConsoleData();
+        this.starshipConnectionData = new StarshipConnectionData();
         this.connectionData = new ConnectionData();
         this.lobbyData = new LobbyData();
         this.pilotingData = new PilotingData();
@@ -72,9 +75,8 @@ public class DataManager extends Thread {
                 screens.put(loadedScreen.getScreenName(), loadedScreen);
             }
         }
-        // TODO Do other stuff
         this.screenManager.setScreens(screens);
-        this.screenManager.changeScreen("Menu");
+        this.screenManager.makeCurrentScreen("Menu");
     }
     
     public InputManager getInputManager() {
@@ -85,9 +87,9 @@ public class DataManager extends Thread {
         return screenManager;
     }
 
-    private DataSource findDataSource(String path) {
-        if(path.startsWith(consolePrefix)) {
-            return this.consoleData.getDataSourceFromPath(path.substring(consolePrefix.length()));
+    private DataSource findDataSource(String dataPath) {
+        if(dataPath.startsWith(consolePrefix)) {
+            return this.starshipConnectionData.getDataSourceFromPath(dataPath.substring(consolePrefix.length()));
         }
         return null;
     }
@@ -96,9 +98,17 @@ public class DataManager extends Thread {
         return this.screenManager.getWidgetPath(point);
     }
     
+    public ControlledData findControlledData(String widgetPath) {
+        String dataPath = this.screenManager.getDataPathForWidgetPath(widgetPath);
+        if(dataPath.startsWith(consolePrefix)) {
+            return this.starshipConnectionData.getControlledDataFromPath(dataPath.substring(consolePrefix.length()));
+        }
+        return null;
+    }
+    
     private void processInput() {
-        if(this.starshipConnection.isConnected()) {
-            for(STSdown message : this.starshipConnection.receiveMessagesFromStarship()) {
+        if(this.starshipConnectionData.isConnected()) {
+            for(STSdown message : this.starshipConnectionData.receiveMessagesFromStarship()) {
                 if(message.hasConnection()) {
                     this.connectionData.processConnection(message.getConnection());
                 }
@@ -128,7 +138,15 @@ public class DataManager extends Thread {
             if(stsUpPiloting != null) {
                 stsUp.setPiloting(stsUpPiloting);
             }
-            this.starshipConnection.sendMessageToStarship(stsUp.build());
+            this.starshipConnectionData.sendMessageToStarship(stsUp.build());
+        }
+    }
+    
+    private void checkScreenChangeConditions() {
+        if(this.starshipConnectionData.isConnected()) {
+            this.screenManager.makeCurrentScreen("Lobby");
+        } else {
+            this.screenManager.makeCurrentScreen("Menu");
         }
     }
     

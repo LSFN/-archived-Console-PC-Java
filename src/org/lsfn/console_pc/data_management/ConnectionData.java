@@ -2,20 +2,24 @@ package org.lsfn.console_pc.data_management;
 
 import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
+import org.lsfn.console_pc.data_management.elements.BooleanDataSource;
+import org.lsfn.console_pc.data_management.elements.TypeableInteger;
+import org.lsfn.console_pc.data_management.elements.TypeableString;
+import org.lsfn.console_pc.data_management.elements.UpdatableBoolean;
 
 public class ConnectionData {
 
-    private UnchangingBoolean connectedToNebula;
+    private BooleanDataSource connectedToNebula;
     
-    private UpdatableString hostname;
-    private UpdatableInteger port;
+    private TypeableString hostname;
+    private TypeableInteger port;
     private UpdatableBoolean desiredConnectionState;
     
     public ConnectionData() {
-        this.connectedToNebula = new UnchangingBoolean(false);
+        this.connectedToNebula = new BooleanDataSource(false);
         
-        this.hostname = new UpdatableString("localhost");
-        this.port = new UpdatableInteger(39461);
+        this.hostname = new TypeableString("localhost");
+        this.port = new TypeableInteger(39461);
         this.desiredConnectionState = new UpdatableBoolean(false);
     }
     
@@ -23,18 +27,10 @@ public class ConnectionData {
         if(connection.hasConnected()) {
             this.connectedToNebula.setData(connection.getConnected());
         }
-    }
-    
-    public UnchangingDataPointer getDataLocation(String path) {
-        if(path.equals("connectedToNebula")) {
-            return this.connectedToNebula;
-        }
-        return null;
-    }
-    
+    }    
     
     public STSup.Connection generateOutput() {
-        if(this.desiredConnectionState.isFlagSet()) {
+        if(this.desiredConnectionState.flagRaised()) {
             STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
             if(this.desiredConnectionState.getData()) {
                 stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);

@@ -14,19 +14,13 @@ message ScreenConfig {
     }
     
     message OutputLink {
-        required string outputPath = 1;
+        required string dataPath = 1;
         required string widgetPath = 2;
     }
     
     message InputLink {
-        message Binding {
-            required string control = 1;
-            required string command = 2;
-        }
-
-        required string widgetPath = 1;
-        required string inputPath = 2;
-        repeated Binding bindings = 3;
+        required string dataPath = 1;
+        required string widgetPath = 2;
     }
     
     required string screenName = 1;

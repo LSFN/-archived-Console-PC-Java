@@ -7,22 +7,13 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JPanel;
 
-import org.lsfn.console_pc.data_management.DataManager;
-
 public class ScreenManager extends JPanel implements HierarchyBoundsListener {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -5930093272563853637L;
     private Screen screen;
     private Map<String, Screen> screens;
@@ -38,11 +29,21 @@ public class ScreenManager extends JPanel implements HierarchyBoundsListener {
         this.screens = screens;
     }
     
-    public void changeScreen(String screenName) {
+    private void setCurrentScreen(String screenName) {
         this.screen = this.screens.get(screenName);
         if(this.screen != null) {
             this.screen.setBounds(getBounds());
             //this.screen.linkOutputs(this.dataManager.getOutputsFromPaths(this.screen.getWidgetMapping().values()));
+        }
+    }
+        
+    public void makeCurrentScreen(String screenName) {
+        if(this.screen != null) {
+            if(this.screen.getScreenName().equals(screenName)) {
+                setCurrentScreen(screenName);
+            }
+        } else {
+            setCurrentScreen(screenName);
         }
     }
     
@@ -82,6 +83,13 @@ public class ScreenManager extends JPanel implements HierarchyBoundsListener {
         if(this.screen != null) {
             this.screen.setBounds(getBounds());
         }
+    }
+
+    public String getDataPathForWidgetPath(String widgetPath) {
+        if(this.screen != null) {
+            return this.screen.getControlMapping().get(widgetPath).getDataPath();
+        }
+        return null;
     }
     
     
