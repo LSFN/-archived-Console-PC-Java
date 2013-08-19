@@ -23,6 +23,7 @@ public class ConsolePC extends JFrame {
         this.setFocusable(true);
         //this.setUndecorated(true);
         this.setSize(WIDTH, HEIGHT);
+        this.setTitle("LSFN");
         this.setVisible(true);
         this.createBufferStrategy(2);
         this.dataManager = new DataManager();

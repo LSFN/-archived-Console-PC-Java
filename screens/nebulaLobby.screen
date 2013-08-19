@@ -1,0 +1,90 @@
+screenName: "Nebula Lobby"
+widgetLayout {
+    name: "lobby"
+    vertical: true
+    ratio: 1
+    spacing: 0
+    colour: "0xFFFFFF"
+    widgetLayout {
+        name: "leftColumn"
+        vertical: true
+        ratio: 1
+        spacing: 10
+        colour: "0x0000FF"
+        widgetLayout {
+            name: "disconnectNebula"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            text: "Disconnect from Nebula"
+            colour: "0x0000FF" 
+        }
+        widgetLayout {
+            name: "readyButton"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            text: "ready"
+            colour: "0x0000FF" 
+        }
+        widgetLayout {
+            name: "readyIndicator"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            colour: "0x000000" 
+        }
+        widgetLayout {
+            name: "shipNameEntry"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            colour: "0x000000" 
+        }
+    }
+    widgetLayout {
+        name: "rightColumn"
+        vertical: true
+        ratio: 1
+        spacing: 10
+        colour: "0xFFFFFF"
+        widgetLayout {
+            name: "shipName"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            colour: "0x000000"
+        }
+        widgetLayout {
+            name: "shipList"
+            vertical: false
+            ratio: 4
+            spacing: 10
+            colour: "0x000000"
+        }
+    }
+}
+outputLinks {
+    dataPath: "lobby/shipName"
+    widgetPath: "lobby/leftColumn/shipNameEntry"
+}
+outputLinks {
+    dataPath: "lobby/nebulaReady"
+    widgetPath: "lobby/leftColumn/readyIndicator"
+}
+outputLinks {
+    dataPath: "lobby/nebulaShipName"
+    widgetPath: "lobby/rightColumn/shipName"
+}
+outputLinks {
+    dataPath: "lobby/shipList"
+    widgetPath: "lobby/rightColumn/shipList"
+}
+inputLinks {
+    dataPath: "lobby/shipName"
+    widgetPath: "lobby/leftColumn/shipName"
+}
+inputLinks {
+    dataPath: "lobby/ready"
+    widgetPath: "lobby/nebulaHost"
+}

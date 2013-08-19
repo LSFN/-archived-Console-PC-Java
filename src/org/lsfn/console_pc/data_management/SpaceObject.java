@@ -1,7 +1,5 @@
 package org.lsfn.console_pc.data_management;
 
-import java.awt.Graphics2D;
-
 public class SpaceObject {
 
     private double x, y, theta;

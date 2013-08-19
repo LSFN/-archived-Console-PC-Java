@@ -17,8 +17,8 @@ import org.lsfn.console_pc.screen_management.ScreenOutputLink;
 
 public class DataManager extends Thread {
 
-    private static final String consolePrefix = "console/";
-    private static final String connectionPrefix = "connection/";
+    private static final String starshipConnectionPrefix = "starshipConnection/";
+    private static final String nebulaConnectionPrefix = "nebulaConnection/";
     private static final String lobbyPrefix = "lobby/";
     private static final String pilotingPrefix = "piloting/";
     private static final String visualSensorsPrefix = "visual_sensors/";
@@ -30,7 +30,7 @@ public class DataManager extends Thread {
     
     //private ConsoleData consoleData;
     private StarshipConnectionData starshipConnectionData;
-    private ConnectionData connectionData;
+    private NebulaConnectionData nebulaConnectionData;
     private LobbyData lobbyData;
     private PilotingData pilotingData;
     private VisualSensorsData visualSensorsData;
@@ -46,7 +46,7 @@ public class DataManager extends Thread {
         
         //this.consoleData = new ConsoleData();
         this.starshipConnectionData = new StarshipConnectionData();
-        this.connectionData = new ConnectionData();
+        this.nebulaConnectionData = new NebulaConnectionData();
         this.lobbyData = new LobbyData();
         this.pilotingData = new PilotingData();
         this.visualSensorsData = new VisualSensorsData();
@@ -88,8 +88,12 @@ public class DataManager extends Thread {
     }
 
     private DataSource findDataSource(String dataPath) {
-        if(dataPath.startsWith(consolePrefix)) {
-            return this.starshipConnectionData.getDataSourceFromPath(dataPath.substring(consolePrefix.length()));
+        if(dataPath.startsWith(starshipConnectionPrefix)) {
+            return this.starshipConnectionData.getDataSourceFromPath(dataPath.substring(starshipConnectionPrefix.length()));
+        } else if(dataPath.startsWith(nebulaConnectionPrefix)) {
+            return this.nebulaConnectionData.getDataSourceFromPath(dataPath.substring(nebulaConnectionPrefix.length()));
+        } else if(dataPath.startsWith(lobbyPrefix)) {
+            return this.lobbyData.getDataSourceFromPath(dataPath.substring(lobbyPrefix.length()));
         }
         return null;
     }
@@ -100,8 +104,12 @@ public class DataManager extends Thread {
     
     public ControlledData findControlledData(String widgetPath) {
         String dataPath = this.screenManager.getDataPathForWidgetPath(widgetPath);
-        if(dataPath.startsWith(consolePrefix)) {
-            return this.starshipConnectionData.getControlledDataFromPath(dataPath.substring(consolePrefix.length()));
+        if(dataPath.startsWith(starshipConnectionPrefix)) {
+            return this.starshipConnectionData.getControlledDataFromPath(dataPath.substring(starshipConnectionPrefix.length()));
+        } else if(dataPath.startsWith(nebulaConnectionPrefix)) {
+            return this.nebulaConnectionData.getControlledDataFromPath(dataPath.substring(nebulaConnectionPrefix.length()));
+        } else if(dataPath.startsWith(lobbyPrefix)) {
+            return this.lobbyData.getControlledDataFromPath(dataPath.substring(lobbyPrefix.length()));
         }
         return null;
     }
@@ -110,7 +118,7 @@ public class DataManager extends Thread {
         if(this.starshipConnectionData.isConnected()) {
             for(STSdown message : this.starshipConnectionData.receiveMessagesFromStarship()) {
                 if(message.hasConnection()) {
-                    this.connectionData.processConnection(message.getConnection());
+                    this.nebulaConnectionData.processConnection(message.getConnection());
                 }
                 if(message.hasLobby()) {
                     this.lobbyData.processLobby(message.getLobby());
@@ -123,28 +131,34 @@ public class DataManager extends Thread {
     }
     
     private void generateOutput() {
-        STSup.Connection stsUpConnection = this.connectionData.generateOutput();
-        STSup.Lobby stsUpLobby = this.lobbyData.generateOutput();
-        STSup.Piloting stsUpPiloting = this.pilotingData.generateOutput();
-        
-        if(stsUpConnection != null || stsUpLobby != null || stsUpPiloting != null) {
-            STSup.Builder stsUp = STSup.newBuilder();
-            if(stsUpConnection != null) {
-                stsUp.setConnection(stsUpConnection);
+        if(this.starshipConnectionData.isConnected()) {
+            STSup.Connection stsUpConnection = this.nebulaConnectionData.generateOutput();
+            STSup.Lobby stsUpLobby = this.lobbyData.generateOutput();
+            STSup.Piloting stsUpPiloting = this.pilotingData.generateOutput();
+            
+            if(stsUpConnection != null || stsUpLobby != null || stsUpPiloting != null) {
+                STSup.Builder stsUp = STSup.newBuilder();
+                if(stsUpConnection != null) {
+                    stsUp.setConnection(stsUpConnection);
+                }
+                if(stsUpLobby != null) {
+                    stsUp.setLobby(stsUpLobby);
+                }
+                if(stsUpPiloting != null) {
+                    stsUp.setPiloting(stsUpPiloting);
+                }
+                this.starshipConnectionData.sendMessageToStarship(stsUp.build());
             }
-            if(stsUpLobby != null) {
-                stsUp.setLobby(stsUpLobby);
-            }
-            if(stsUpPiloting != null) {
-                stsUp.setPiloting(stsUpPiloting);
-            }
-            this.starshipConnectionData.sendMessageToStarship(stsUp.build());
         }
     }
     
     private void checkScreenChangeConditions() {
         if(this.starshipConnectionData.isConnected()) {
-            this.screenManager.makeCurrentScreen("Lobby");
+            if(this.nebulaConnectionData.isConnected()) {
+                this.screenManager.makeCurrentScreen("Nebula Lobby");
+            } else {
+                this.screenManager.makeCurrentScreen("Starship Lobby");
+            }
         } else {
             this.screenManager.makeCurrentScreen("Menu");
         }
@@ -155,6 +169,8 @@ public class DataManager extends Thread {
         setupScreens();        
         this.running = true;
         while(this.running) {
+            // Change the screen if need be
+            checkScreenChangeConditions();
             // Process the input from the Starship (if connected)
             processInput();
             // Paint the screen

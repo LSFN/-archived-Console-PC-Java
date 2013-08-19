@@ -37,22 +37,22 @@ widgetLayout {
     }
 }
 outputLinks {
-    dataPath: "console/hostname"
+    dataPath: "starshipConnection/hostname"
     widgetPath: "menu/host"
 }
 outputLinks {
-    dataPath: "console/port"
+    dataPath: "starshipConnection/port"
     widgetPath: "menu/port"
 }
 inputLinks {
-    dataPath: "console/connect"
+    dataPath: "starshipConnection/connect"
     widgetPath: "menu/connect"
 }
 inputLinks {
-    dataPath: "console/hostname"
+    dataPath: "starshipConnection/hostname"
     widgetPath: "menu/host"
 }
 inputLinks {
-    dataPath: "console/port"
+    dataPath: "starshipConnection/port"
     widgetPath: "menu/port"
 }

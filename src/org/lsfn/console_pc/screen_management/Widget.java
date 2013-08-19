@@ -8,7 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.lsfn.console_pc.data_management.elements.DataSource;
@@ -20,7 +21,7 @@ public class Widget {
 
     private String name;
     private boolean verticalWidget;
-    private Map<String, Widget> subWidgets;
+    private List<Widget> subWidgets;
     private Integer ratio;
     private Integer ratioSum;
     private Color colour;
@@ -48,16 +49,20 @@ public class Widget {
             this.colour = Color.BLACK;
         }
         
-        this.subWidgets = new HashMap<String, Widget>();
+        this.subWidgets = new ArrayList<Widget>();
         this.ratioSum = 0;
         for(WidgetLayout subLayout : layout.getWidgetLayoutList()) {
             Widget widget = new Widget(subLayout);
-            this.subWidgets.put(widget.name, widget);
+            this.subWidgets.add(widget);
             this.ratioSum += widget.getRatio();
         }
         
         this.bounds = null;
         this.dataSource = null;
+    }
+    
+    public String getName() {
+        return name;
     }
     
     public boolean isVerticalWidget() {
@@ -68,7 +73,7 @@ public class Widget {
         return ratio;
     }
     
-    public Map<String, Widget> getSubWidgets() {
+    public List<Widget> getSubWidgets() {
         return subWidgets;
     }
 
@@ -103,7 +108,7 @@ public class Widget {
             
             int y = (int)bounds.getY() + this.spacing;
             double baseHeight = (bounds.getHeight() - this.spacing) / this.ratioSum;
-            for(Widget widget : this.subWidgets.values()) {
+            for(Widget widget : this.subWidgets) {
                 double rectangleTopDifference = widget.getRatio() * baseHeight;
                 int height = (int)(rectangleTopDifference - this.spacing);
                 Rectangle subWidgetBounds = new Rectangle(x, y, width, height);
@@ -117,7 +122,7 @@ public class Widget {
             
             int x = (int)bounds.getX() + this.spacing;
             double baseWidth = (bounds.getWidth() - this.spacing) / this.ratioSum;
-            for(Widget widget : this.subWidgets.values()) {
+            for(Widget widget : this.subWidgets) {
                 double rectangleLeftDifference = widget.getRatio() * baseWidth;
                 int width = (int)(rectangleLeftDifference - this.spacing);
                 Rectangle subWidgetBounds = new Rectangle(x, y, width, height);
@@ -128,7 +133,7 @@ public class Widget {
     }
     
     public String getWidgetPath(Point p) {
-        for(Widget widget : subWidgets.values()) {
+        for(Widget widget : subWidgets) {
             if(widget.getBounds().contains(p)) {
                 return this.name + "/" + widget.getWidgetPath(p);
             }
@@ -141,9 +146,9 @@ public class Widget {
             this.dataSource = dataSource;
         } else {
             String cutPath = path.substring(this.name.length()+1);
-            for(String widgetName : this.subWidgets.keySet()) {
-                if(cutPath.startsWith(widgetName)) {
-                    this.subWidgets.get(widgetName).setWidgetData(cutPath, dataSource);
+            for(Widget subWidget : subWidgets) {
+                if(cutPath.startsWith(subWidget.getName())) {
+                    subWidget.setWidgetData(cutPath, dataSource);
                 }
             }
         }
@@ -174,7 +179,7 @@ public class Widget {
         }
         
         // Draw all the sub-widgets
-        for(Widget widget : this.subWidgets.values()) {
+        for(Widget widget : this.subWidgets) {
             widget.drawWidget(g);
         }
     }

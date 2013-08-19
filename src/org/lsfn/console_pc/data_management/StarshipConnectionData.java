@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
-import org.lsfn.console_pc.data_management.elements.BooleanDataSource;
 import org.lsfn.console_pc.data_management.elements.ControlledData;
 import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.data_management.elements.TypeableInteger;
@@ -33,6 +32,7 @@ public class StarshipConnectionData extends Thread {
     private TypeableString hostname;
     private TypeableInteger port;
     private StarshipConnectionConnectClickListener connectListener;
+    private StarshipConnectionDisconnectClickListener disconnectListener;
     
     public StarshipConnectionData() {
         this.starshipSocket = null;
@@ -46,6 +46,7 @@ public class StarshipConnectionData extends Thread {
         this.hostname = new TypeableString("localhost");
         this.port = new TypeableInteger(39460);
         this.connectListener = new StarshipConnectionConnectClickListener(this); 
+        this.disconnectListener = new StarshipConnectionDisconnectClickListener(this);
     }
 
     public DataSource getDataSourceFromPath(String dataPath) {
@@ -64,6 +65,8 @@ public class StarshipConnectionData extends Thread {
             return this.port;
         } else if(dataPath.equals("connect")) {
             return this.connectListener;
+        } else if(dataPath.equals("disconnect")) {
+            return this.disconnectListener;
         }
         return null;
     }
@@ -74,10 +77,11 @@ public class StarshipConnectionData extends Thread {
             this.starshipSocket = new Socket(this.hostname.getData(), this.port.getData());
             this.starshipInput = new BufferedInputStream(starshipSocket.getInputStream());
             this.starshipOutput = new BufferedOutputStream(starshipSocket.getOutputStream());
-            this.connected = false;
+            this.connected = true;
             this.timeLastMessageReceived = System.currentTimeMillis();
             this.timeLastMessageSent = System.currentTimeMillis();
             this.start();
+            System.out.println("Connected to Starship successfully.");
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -137,7 +141,7 @@ public class StarshipConnectionData extends Thread {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                this.connected = false;
+                disconnect();
             }
             
             if(System.currentTimeMillis() >= this.timeLastMessageReceived + timeout) {

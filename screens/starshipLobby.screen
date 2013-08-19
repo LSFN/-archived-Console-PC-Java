@@ -1,0 +1,62 @@
+screenName: "Starship Lobby"
+widgetLayout {
+    name: "lobby"
+    vertical: true
+    ratio: 1
+    spacing: 10
+    colour: "0xFFFFFF"
+    widgetLayout {
+        name: "disconnectStarship"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "Disconnect from Starship"
+        colour: "0x0000FF"
+    }
+    widgetLayout {
+        name: "nebulaHost"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        colour: "0x000000"
+    }
+    widgetLayout {
+        name: "nebulaPort"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        colour: "0x000000"
+    }
+    widgetLayout {
+        name: "nebulaConnect"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "Connect to Nebula"
+        colour: "0x0000FF"
+    }
+}
+outputLinks {
+    dataPath: "nebulaConnection/hostname"
+    widgetPath: "lobby/nebulaHost"
+}
+outputLinks {
+    dataPath: "nebulaConnection/port"
+    widgetPath: "lobby/nebulaPort"
+}
+inputLinks {
+    dataPath: "nebulaConnection/hostname"
+    widgetPath: "lobby/nebulaHost"
+}
+inputLinks {
+    dataPath: "nebulaConnection/port"
+    widgetPath: "lobby/nebulaPort"
+}
+inputLinks {
+    dataPath: "nebulaConnection/connect"
+    widgetPath: "lobby/nebulaConnect"
+}
+inputLinks {
+    dataPath: "starshipConnection/disconnect"
+    widgetPath: "lobby/disconnectStarship"
+}

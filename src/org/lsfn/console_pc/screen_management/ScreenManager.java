@@ -30,16 +30,16 @@ public class ScreenManager extends JPanel implements HierarchyBoundsListener {
     }
     
     private void setCurrentScreen(String screenName) {
+        System.out.println("Changing screen to " + screenName);
         this.screen = this.screens.get(screenName);
         if(this.screen != null) {
             this.screen.setBounds(getBounds());
-            //this.screen.linkOutputs(this.dataManager.getOutputsFromPaths(this.screen.getWidgetMapping().values()));
         }
     }
         
     public void makeCurrentScreen(String screenName) {
         if(this.screen != null) {
-            if(this.screen.getScreenName().equals(screenName)) {
+            if(!this.screen.getScreenName().equals(screenName)) {
                 setCurrentScreen(screenName);
             }
         } else {
@@ -63,7 +63,7 @@ public class ScreenManager extends JPanel implements HierarchyBoundsListener {
     
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(1280, 1024);
+        return new Dimension(1024, 768);
     }
     
     public String getWidgetPath(Point p) {

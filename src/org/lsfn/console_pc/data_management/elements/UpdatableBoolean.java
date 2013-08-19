@@ -1,6 +1,9 @@
 package org.lsfn.console_pc.data_management.elements;
 
-public class UpdatableBoolean {
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
+public class UpdatableBoolean implements ControlledData {
 
     private boolean data;
     private boolean flag;
@@ -27,5 +30,45 @@ public class UpdatableBoolean {
     
     public void resetFlag() {
         this.flag = false;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent arg0) {
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent arg0) {
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent arg0) {
+        
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+        this.data = !this.data;
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        
+    }
+
+    @Override
+    public void mousePressed(MouseEvent arg0) {
+        
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        
     }
 }

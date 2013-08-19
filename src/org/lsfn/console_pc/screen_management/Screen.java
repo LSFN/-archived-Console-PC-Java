@@ -48,7 +48,6 @@ public class Screen {
     public static Screen loadScreen(String screenFile) {
         FileReader screenFileReader;
         try {
-            System.out.println("Reading file.");
             screenFileReader = new FileReader(screenFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -56,13 +55,11 @@ public class Screen {
         }
         ScreenConfig.Builder config = ScreenConfig.newBuilder();
         try {
-            System.out.println("Making builder.");
             TextFormat.merge(screenFileReader, config);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        System.out.println("Succeeded in doing all of that.");
         return new Screen(config.build());
     }
     

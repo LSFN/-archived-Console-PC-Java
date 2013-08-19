@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
 import org.lsfn.console_pc.data_management.elements.BooleanDataSource;
+import org.lsfn.console_pc.data_management.elements.ControlledData;
+import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.data_management.elements.ObjectDataSource;
 import org.lsfn.console_pc.data_management.elements.StringDataSource;
 import org.lsfn.console_pc.data_management.elements.TypeableString;
@@ -59,6 +61,30 @@ public class LobbyData {
                 this.desiredShipName.resetFlag();
             }
             return lobby.build();
+        }
+        return null;
+    }
+    
+    public DataSource getDataSourceFromPath(String dataPath) {
+        if(dataPath.equals("nebulaReady")) {
+            return this.lobbyReadyState;
+        } else if(dataPath.equals("nebulaShipName")) {
+            return this.lobbyShipName;
+        } else if(dataPath.equals("shipName")) {
+            return this.desiredShipName;
+        } else if(dataPath.equals("shipList")) {
+            return this.lobbyShipsInGame;
+        } else if(dataPath.equals("gameStarted")) {
+            return this.lobbyGameStarted;
+        }
+        return null;
+    }
+
+    public ControlledData getControlledDataFromPath(String dataPath) {
+        if(dataPath.equals("shipName")) {
+            return this.desiredShipName;
+        } else if(dataPath.equals("ready")) {
+            return this.desiredReadyState;
         }
         return null;
     }
