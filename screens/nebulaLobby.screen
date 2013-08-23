@@ -1,7 +1,7 @@
 screenName: "Nebula Lobby"
 widgetLayout {
     name: "lobby"
-    vertical: true
+    vertical: false
     ratio: 1
     spacing: 0
     colour: "0xFFFFFF"
@@ -10,14 +10,14 @@ widgetLayout {
         vertical: true
         ratio: 1
         spacing: 10
-        colour: "0x0000FF"
+        colour: "0xFFFFFF"
         widgetLayout {
             name: "disconnectNebula"
             vertical: false
             ratio: 1
             spacing: 10
             text: "Disconnect from Nebula"
-            colour: "0x0000FF" 
+            colour: "0x0000FF"
         }
         widgetLayout {
             name: "readyButton"
@@ -25,21 +25,21 @@ widgetLayout {
             ratio: 1
             spacing: 10
             text: "ready"
-            colour: "0x0000FF" 
+            colour: "0x0000FF"
         }
         widgetLayout {
             name: "readyIndicator"
             vertical: false
             ratio: 1
             spacing: 10
-            colour: "0x000000" 
+            colour: "0x000000"
         }
         widgetLayout {
             name: "shipNameEntry"
             vertical: false
             ratio: 1
             spacing: 10
-            colour: "0x000000" 
+            colour: "0x000000"
         }
     }
     widgetLayout {
@@ -82,9 +82,13 @@ outputLinks {
 }
 inputLinks {
     dataPath: "lobby/shipName"
-    widgetPath: "lobby/leftColumn/shipName"
+    widgetPath: "lobby/leftColumn/shipNameEntry"
 }
 inputLinks {
     dataPath: "lobby/ready"
-    widgetPath: "lobby/nebulaHost"
+    widgetPath: "lobby/leftColumn/readyButton"
+}
+inputLinks {
+    dataPath: "nebulaConnection/disconnect"
+    widgetPath: "lobby/leftColumn/disconnectNebula"
 }

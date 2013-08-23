@@ -1,3 +1,5 @@
+
+
 package org.lsfn.console_pc.data_management;
 
 import org.lsfn.console_pc.STS.STSdown;
@@ -15,18 +17,38 @@ public class NebulaConnectionData {
     
     private TypeableString hostname;
     private TypeableInteger port;
-    private UpdatableBoolean desiredConnectionState;
+    private NebulaConnectionConnectClickListener connectClickListener;
+    private NebulaConnectionDisconnectClickListener disconnectClickListener;
+    
+    private boolean sendConnectMessage;
+    private boolean sendDisconnectMessage;
     
     public NebulaConnectionData() {
         this.connectedToNebula = new BooleanDataSource(false);
         
         this.hostname = new TypeableString("localhost");
         this.port = new TypeableInteger(39461);
-        this.desiredConnectionState = new UpdatableBoolean(false);
+        this.connectClickListener = new NebulaConnectionConnectClickListener(this);
+        this.disconnectClickListener = new NebulaConnectionDisconnectClickListener(this);
+        
+        this.sendConnectMessage = false;
+        this.sendDisconnectMessage = false;
     }
     
     public boolean isConnected() {
         return this.connectedToNebula.getData();
+    }
+    
+    public void connect() {
+        if(!this.connectedToNebula.getData()) {
+            this.sendConnectMessage = true;
+        }
+    }
+    
+    public void disconnect() {
+        if(this.connectedToNebula.getData()) {
+            this.sendDisconnectMessage = true;
+        }
     }
     
     public void processConnection(STSdown.Connection connection) {
@@ -36,16 +58,18 @@ public class NebulaConnectionData {
     }    
     
     public STSup.Connection generateOutput() {
-        if(this.desiredConnectionState.flagRaised()) {
+        if(this.sendConnectMessage) {
+            this.sendConnectMessage = false;
             STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
-            if(this.desiredConnectionState.getData()) {
-                stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);
-                stsUpConnection.setHost(hostname.getData());
-                stsUpConnection.setPort(port.getData());
-            } else {
-                stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.DISCONNECT);
-            }
-            this.desiredConnectionState.resetFlag();
+            stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);
+            stsUpConnection.setHost(hostname.getData());
+            stsUpConnection.setPort(port.getData());
+            return stsUpConnection.build();
+        }
+        if(this.sendDisconnectMessage) {
+            this.sendDisconnectMessage = false;
+            STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
+            stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.DISCONNECT);
             return stsUpConnection.build();
         }
         return null;
@@ -68,8 +92,10 @@ public class NebulaConnectionData {
             return this.hostname;
         } else if(dataPath.equals("port")) {
             return this.port;
-        } else if(dataPath.equals("connection")) {
-            return this.desiredConnectionState;
+        } else if(dataPath.equals("connect")) {
+            return this.connectClickListener;
+        } else if(dataPath.equals("disconnect")) {
+            return this.disconnectClickListener;
         }
         return null;
     }

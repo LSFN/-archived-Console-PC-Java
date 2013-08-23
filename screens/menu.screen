@@ -6,18 +6,25 @@ widgetLayout {
     spacing: 10
     colour: "0xFFFFFF"
     widgetLayout {
-        name: "host"
+        name: "connectionInfo"
         vertical: false
         ratio: 1
-        spacing: 10
+        spacing: 0
         colour: "0x000000"
-    }
-    widgetLayout {
-        name: "port"
-        vertical: false
-        ratio: 1
-        spacing: 10
-        colour: "0x000000"
+        widgetLayout {
+            name: "host"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            colour: "0x000000"
+        }
+        widgetLayout {
+            name: "port"
+            vertical: false
+            ratio: 1
+            spacing: 10
+            colour: "0x000000"
+        }
     }
     widgetLayout {
         name: "connect"
@@ -25,6 +32,14 @@ widgetLayout {
         ratio: 1
         spacing: 10
         text: "connect"
+        colour: "0x0000FF"
+    }
+    widgetLayout {
+        name: "shipDesigner"
+        vertical: false
+        ratio: 1
+        spacing: 10
+        text: "Ship designer"
         colour: "0x0000FF"
     }
     widgetLayout {
@@ -38,11 +53,11 @@ widgetLayout {
 }
 outputLinks {
     dataPath: "starshipConnection/hostname"
-    widgetPath: "menu/host"
+    widgetPath: "menu/connectionInfo/host"
 }
 outputLinks {
     dataPath: "starshipConnection/port"
-    widgetPath: "menu/port"
+    widgetPath: "menu/connectionInfo/port"
 }
 inputLinks {
     dataPath: "starshipConnection/connect"
@@ -50,9 +65,13 @@ inputLinks {
 }
 inputLinks {
     dataPath: "starshipConnection/hostname"
-    widgetPath: "menu/host"
+    widgetPath: "menu/connectionInfo/host"
 }
 inputLinks {
     dataPath: "starshipConnection/port"
-    widgetPath: "menu/port"
+    widgetPath: "menu/connectionInfo/port"
+}
+inputLinks {
+    dataPath: "shipDesigner/active"
+    widgetPath: "menu/shipDesigner"
 }

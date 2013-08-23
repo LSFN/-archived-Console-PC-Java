@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.lsfn.console_pc.STS.STSdown;
 import org.lsfn.console_pc.STS.STSup;
+import org.lsfn.console_pc.StarshipConnection;
 import org.lsfn.console_pc.data_management.elements.ControlledData;
 import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.input_management.InputManager;
@@ -17,16 +18,18 @@ import org.lsfn.console_pc.screen_management.ScreenOutputLink;
 
 public class DataManager extends Thread {
 
+    private static final int tickInterval = 50;    
     private static final String starshipConnectionPrefix = "starshipConnection/";
     private static final String nebulaConnectionPrefix = "nebulaConnection/";
     private static final String lobbyPrefix = "lobby/";
     private static final String pilotingPrefix = "piloting/";
-    private static final String visualSensorsPrefix = "visual_sensors/";
+    private static final String visualSensorsPrefix = "visualSensors/";
+    private static final String shipDesignerPrefix = "shipDesigner/";
     
     private InputManager inputManager;
     private ScreenManager screenManager;
     
-    //private StarshipConnection starshipConnection;
+    private StarshipConnection starshipConnection;
     
     //private ConsoleData consoleData;
     private StarshipConnectionData starshipConnectionData;
@@ -34,6 +37,7 @@ public class DataManager extends Thread {
     private LobbyData lobbyData;
     private PilotingData pilotingData;
     private VisualSensorsData visualSensorsData;
+    private ShipDesignerData shipDesignerData;
     
     private boolean running;
     
@@ -42,14 +46,15 @@ public class DataManager extends Thread {
         this.screenManager = new ScreenManager();
         this.screenManager.addMouseListener(this.inputManager);
         
-        //this.starshipConnection = new StarshipConnection();
+        this.starshipConnection = new StarshipConnection();
         
         //this.consoleData = new ConsoleData();
-        this.starshipConnectionData = new StarshipConnectionData();
+        this.starshipConnectionData = new StarshipConnectionData(this.starshipConnection);
         this.nebulaConnectionData = new NebulaConnectionData();
         this.lobbyData = new LobbyData();
         this.pilotingData = new PilotingData();
         this.visualSensorsData = new VisualSensorsData();
+        this.shipDesignerData = new ShipDesignerData(this.screenManager);
     }
     
     private void setupScreens() {
@@ -94,6 +99,8 @@ public class DataManager extends Thread {
             return this.nebulaConnectionData.getDataSourceFromPath(dataPath.substring(nebulaConnectionPrefix.length()));
         } else if(dataPath.startsWith(lobbyPrefix)) {
             return this.lobbyData.getDataSourceFromPath(dataPath.substring(lobbyPrefix.length()));
+        } else if(dataPath.startsWith(shipDesignerPrefix)) {
+            return this.shipDesignerData.getDataSourceFromPath(dataPath.substring(shipDesignerPrefix.length()));
         }
         return null;
     }
@@ -110,13 +117,15 @@ public class DataManager extends Thread {
             return this.nebulaConnectionData.getControlledDataFromPath(dataPath.substring(nebulaConnectionPrefix.length()));
         } else if(dataPath.startsWith(lobbyPrefix)) {
             return this.lobbyData.getControlledDataFromPath(dataPath.substring(lobbyPrefix.length()));
+        } else if(dataPath.startsWith(shipDesignerPrefix)) {
+            return this.shipDesignerData.getControlledDataFromPath(dataPath.substring(shipDesignerPrefix.length()));
         }
         return null;
     }
     
     private void processInput() {
         if(this.starshipConnectionData.isConnected()) {
-            for(STSdown message : this.starshipConnectionData.receiveMessagesFromStarship()) {
+            for(STSdown message : this.starshipConnection.receiveMessagesFromStarship()) {
                 if(message.hasConnection()) {
                     this.nebulaConnectionData.processConnection(message.getConnection());
                 }
@@ -147,13 +156,16 @@ public class DataManager extends Thread {
                 if(stsUpPiloting != null) {
                     stsUp.setPiloting(stsUpPiloting);
                 }
-                this.starshipConnectionData.sendMessageToStarship(stsUp.build());
+                this.starshipConnection.sendMessageToStarship(stsUp.build());
             }
         }
     }
     
     private void checkScreenChangeConditions() {
-        if(this.starshipConnectionData.isConnected()) {
+        System.out.println("starship connected: " + this.starshipConnectionData.isConnected() + ", nebula connected: " + this.nebulaConnectionData.isConnected());
+        if(this.shipDesignerData.isActive()) {
+            this.screenManager.makeCurrentScreen("Ship Designer");
+        } else if(this.starshipConnectionData.isConnected()) {
             if(this.nebulaConnectionData.isConnected()) {
                 this.screenManager.makeCurrentScreen("Nebula Lobby");
             } else {
@@ -177,6 +189,12 @@ public class DataManager extends Thread {
             this.screenManager.repaint();
             // Send any messages that need to be sent to the Starship
             generateOutput();
+            
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -1,0 +1,16 @@
+screenName: "Ship Designer"
+widgetLayout {
+    name: "shipDesigner"
+    vertical: false
+    ratio: 1
+    spacing: 0
+    colour: "0xFFFFFF"
+}
+outputLinks {
+    dataPath: "shipDesigner/shipDesigner"
+    widgetPath: "shipDesigner"
+}
+inputLinks {
+    dataPath: "shipDesigner/shipDesigner"
+    widgetPath: "shipDesigner"
+}

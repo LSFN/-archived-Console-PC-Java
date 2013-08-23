@@ -10,8 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.lsfn.console_pc.data_management.ShipDesigner;
 import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.WidgetLayout;
 
@@ -127,7 +127,7 @@ public class Widget {
                 int width = (int)(rectangleLeftDifference - this.spacing);
                 Rectangle subWidgetBounds = new Rectangle(x, y, width, height);
                 widget.setBounds(subWidgetBounds);
-                y += rectangleLeftDifference;
+                x += rectangleLeftDifference;
             }
         }
     }
@@ -160,6 +160,37 @@ public class Widget {
         g.drawString(strToDraw, (int)(bounds.getCenterX() - stringRect.getWidth()/2), (int)(bounds.getCenterY() - stringRect.getHeight()/2));
     }
     
+    private void drawIndicatorInWidget(Graphics2D g, Boolean booleanToIndicate) {
+        Rectangle rectRed = new Rectangle(this.bounds.x + this.spacing, this.bounds.y + this.spacing,
+                (int)((this.bounds.getWidth() / 2) - this.spacing), (int)(this.bounds.getHeight()-(2*this.spacing)));
+        Rectangle rectGreen = new Rectangle((int)this.bounds.getCenterX(), this.bounds.y + this.spacing,
+                (int)((this.bounds.getWidth() / 2) - this.spacing), (int)(this.bounds.getHeight()-(2*this.spacing)));
+        if(booleanToIndicate) {
+            g.setColor(new Color(32,0,0));
+        } else {
+            g.setColor(new Color(255,0,0));
+        }
+        g.fill(rectRed);
+        if(booleanToIndicate) {
+            g.setColor(new Color(0,255,0));
+        } else {
+            g.setColor(new Color(0,32,0));
+        }
+        g.fill(rectGreen);        
+    }
+    
+    private void drawStringList(Graphics2D g, List<String> stringList) {
+        double spread = bounds.getHeight() / (stringList.size() + 1);
+        double y = spread;
+        g.setColor(invertColour(this.colour));
+        for(String strToDraw : stringList) {
+            Rectangle2D stringRect = g.getFontMetrics().getStringBounds(strToDraw, g);
+            g.drawString(strToDraw, (int)(this.bounds.getCenterX() - stringRect.getWidth()/2), (int)(y - stringRect.getHeight()/2));
+            y += spread;
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
     public void drawWidget(Graphics2D g) {
         // Draw this widget first
         g.setColor(this.colour);
@@ -170,11 +201,30 @@ public class Widget {
         
         if(this.dataSource != null) {
             // Draw whatever data we have linked
-            Object data = this.dataSource.getData();
-            if(data.getClass() == String.class) {
-                drawStringInWidget(g, (String)data);
-            } else if(data.getClass() == Integer.class) {
-                drawStringInWidget(g, ((Integer)data).toString());
+            
+            if(this.dataSource.getClass() == ShipDesigner.class) {
+                ((ShipDesigner)this.dataSource).drawDesigner(g, bounds);
+            } else {
+                Object data = this.dataSource.getData();
+                if(data.getClass() == String.class) {
+                    drawStringInWidget(g, (String)data);
+                } else if(data.getClass() == Integer.class) {
+                    drawStringInWidget(g, ((Integer)data).toString());
+                } else if(data.getClass() == Boolean.class) {
+                    drawIndicatorInWidget(g, (Boolean)data);
+                } else if(data.getClass() == List.class) {
+                    // TODO make not terrible
+                    // Determines the type of a generic
+                    // Stupid erasure
+                    List<Object> generalList = (List<Object>)data;
+                    if(generalList.size() > 0) {
+                        Object o = generalList.get(0);
+                        if(o.getClass() == String.class) {
+                            List<String> stringList = (List<String>)data;
+                            drawStringList(g, stringList);
+                        }
+                    }
+                }
             }
         }
         

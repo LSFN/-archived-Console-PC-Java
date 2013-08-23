@@ -13,4 +13,5 @@ public interface DataSource {
      * @return The data.
      */
     public Object getData();
+    
 }

@@ -14,7 +14,9 @@ public class UpdatableBoolean implements ControlledData {
     }
     
     public void setData(boolean data) {
+        System.out.println("this.data: " + this.data + ", data: " + data);
         if(this.data != data) {
+            System.out.println("Changed boolean state");
             this.data = data;
             this.flag = true;
         }

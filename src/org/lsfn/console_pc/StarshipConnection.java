@@ -6,18 +6,18 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import org.lsfn.console_pc.STS.*;
-import org.lsfn.console_pc.STS.STSdown.Join.Response;
+import org.lsfn.console_pc.STS.STSdown;
+import org.lsfn.console_pc.STS.STSup;
 
-public class StarshipConnection extends Thread {
+public class StarshipConnection implements Runnable {
 
     private static final Integer tickInterval = 50;
     private static final long timeout = 5000;
     private static final long timeBetweenPings = 3000;
     private static final STSup pingMessage = STSup.newBuilder().build();
     
+    private Thread starshipConnectionThread;
     private Socket starshipSocket;
     private BufferedInputStream starshipInput;
     private BufferedOutputStream starshipOutput;
@@ -27,6 +27,7 @@ public class StarshipConnection extends Thread {
     private boolean connected;
     
     public StarshipConnection() {
+        this.starshipConnectionThread = null;
         this.starshipSocket = null;
         this.starshipInput = null;
         this.starshipOutput = null;
@@ -45,7 +46,8 @@ public class StarshipConnection extends Thread {
             this.connected = true;
             this.timeLastMessageReceived = System.currentTimeMillis();
             this.timeLastMessageSent = System.currentTimeMillis();
-            this.start();
+            this.starshipConnectionThread = new Thread(this);
+            this.starshipConnectionThread.start();
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -55,7 +57,7 @@ public class StarshipConnection extends Thread {
     
     public boolean isConnected() {
         if(this.connected && System.currentTimeMillis() >= this.timeLastMessageReceived + timeout) {
-            this.disconnect();
+            disconnect();
         }
         return this.connected;
     }
@@ -67,7 +69,14 @@ public class StarshipConnection extends Thread {
             // We don't care
             e.printStackTrace();
         }
+        // Setting connected to false causes the run() loop to end
         this.connected = false;
+        try {
+            this.starshipConnectionThread.join();
+        } catch (InterruptedException e) {
+            // I hope this never happens.
+            e.printStackTrace();
+        }
     }
     
     public void sendMessageToStarship(STSup upMessage) {
@@ -78,7 +87,7 @@ public class StarshipConnection extends Thread {
                 this.timeLastMessageSent = System.currentTimeMillis();
             } catch (IOException e) {
                 e.printStackTrace();
-                this.connected = false;
+                disconnect();
             }
         }
     }
@@ -107,7 +116,7 @@ public class StarshipConnection extends Thread {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                this.connected = false;
+                disconnect();
             }
             
             if(System.currentTimeMillis() >= this.timeLastMessageSent + timeBetweenPings) {
