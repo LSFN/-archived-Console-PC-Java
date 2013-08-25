@@ -15,6 +15,7 @@ import org.lsfn.console_pc.input_management.InputManager;
 import org.lsfn.console_pc.screen_management.Screen;
 import org.lsfn.console_pc.screen_management.ScreenManager;
 import org.lsfn.console_pc.screen_management.ScreenOutputLink;
+import org.lsfn.console_pc.ship_designer.ShipDesignerData;
 
 public class DataManager extends Thread {
 
@@ -162,7 +163,6 @@ public class DataManager extends Thread {
     }
     
     private void checkScreenChangeConditions() {
-        System.out.println("starship connected: " + this.starshipConnectionData.isConnected() + ", nebula connected: " + this.nebulaConnectionData.isConnected());
         if(this.shipDesignerData.isActive()) {
             this.screenManager.makeCurrentScreen("Ship Designer");
         } else if(this.starshipConnectionData.isConnected()) {

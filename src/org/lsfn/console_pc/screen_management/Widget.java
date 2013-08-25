@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lsfn.console_pc.data_management.ShipDesigner;
 import org.lsfn.console_pc.data_management.elements.DataSource;
 import org.lsfn.console_pc.screen_management.ScreenFile.ScreenConfig.WidgetLayout;
+import org.lsfn.console_pc.ship_designer.ShipDesigner;
 
 import com.google.protobuf.TextFormat;
 

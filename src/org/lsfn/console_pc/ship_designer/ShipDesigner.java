@@ -1,4 +1,4 @@
-package org.lsfn.console_pc.data_management;
+package org.lsfn.console_pc.ship_designer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.io.IOException;
 
@@ -59,8 +58,8 @@ public class ShipDesigner implements DataSource, ControlledData {
         if(bounds.width != this.width || bounds.height != this.height) {
             this.width = bounds.width;
             this.height = bounds.height;
-            this.menu = new Rectangle(0, 0, bounds.width/4, bounds.height);
-            this.design = new Rectangle(bounds.width/4, 0, bounds.width - (bounds.width/4), bounds.height);
+            this.menu = new Rectangle(0, 0, (int)(bounds.getWidth()/4), bounds.height);
+            this.design = new Rectangle((int)(bounds.getWidth()/4), 0, (int)(bounds.getWidth() - (bounds.getWidth()/4)), bounds.height);
         }
     }
     
@@ -135,14 +134,17 @@ public class ShipDesigner implements DataSource, ControlledData {
         g.setColor(Color.BLUE);
         g.fill(menu);
         if(shipImage != null) {
-            double scaleX = bounds.width / shipImage.getWidth();
-            double scaleY = bounds.width / shipImage.getWidth();
+            double scaleX = (double)this.design.width / shipImage.getWidth();
+            double scaleY = (double)this.design.height / shipImage.getHeight();
             double scaleToUse = scaleX;
             if(scaleY < scaleX) {
                 scaleToUse = scaleY;
             }
-            AffineTransform scaleToFitTransform = AffineTransform.getScaleInstance(scaleToUse, scaleToUse);
-            g.drawImage(shipImage, scaleToFitTransform, null);
+            double xPos = this.design.getCenterX() - (this.shipImage.getWidth() / 2);
+            double yPos = this.design.getCenterY() - (this.shipImage.getHeight() / 2);
+            AffineTransform shipImageTransform = AffineTransform.getTranslateInstance(xPos, yPos);
+            shipImageTransform.scale(scaleToUse, scaleToUse);
+            g.drawImage(shipImage, shipImageTransform, null);
         }
     }
 

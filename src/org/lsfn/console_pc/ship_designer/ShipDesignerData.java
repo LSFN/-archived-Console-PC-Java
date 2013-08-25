@@ -1,4 +1,4 @@
-package org.lsfn.console_pc.data_management;
+package org.lsfn.console_pc.ship_designer;
 
 import java.awt.Component;
 
