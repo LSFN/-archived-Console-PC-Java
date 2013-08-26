@@ -1,20 +1,23 @@
 package org.lsfn.console_pc.ship_designer;
 
-import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 public class ShipDesignData {
     
     private BufferedImage shipImage;
+    private BufferedImage transparencyImage;
+    private BufferedImage boundaryImage;
+    private Set<Polygon> boundaryPolygons;
     
     public ShipDesignData(BufferedImage shipImage) {
         this.shipImage = shipImage;
+        computeHull();
     }
     
     private void computeHull() {
@@ -23,33 +26,39 @@ public class ShipDesignData {
         
         // Compute the matrix of opaque pixels versus those that are partially / fully transparent
         int transparencyMatrix[][] = new int[width][height];
+        transparencyImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         WritableRaster alphaRaster = shipImage.getAlphaRaster();
-        int temp[] = new int[0];
+        int temp[] = new int[1];
         for(int x = 0; x < width; x++) {
             for(int y = 0; y < height; y++) {
                 if(alphaRaster.getPixel(x, y, temp)[0] == 255) {
-                    transparencyMatrix[x][y] = 0;
-                } else {
                     transparencyMatrix[x][y] = 1;
+                    transparencyImage.setRGB(x, y, 0xFFFFFF);
+                } else {
+                    transparencyMatrix[x][y] = 0;
+                    transparencyImage.setRGB(x, y, 0xDDDDDD);
                 }
             }
         }
         
         // Compute the matrix of transparent / opaque boundary pixels
         int boundaryMatrix[][] = new int[width][height];
+        boundaryImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         for(int x = 1; x < width-1; x++) {
             for(int y = 1; y < height-1; y++) {
                 if(transparencyMatrix[x][y] == 1 && (transparencyMatrix[x][y+1] == 0 || transparencyMatrix[x][y-1] == 0 ||
                         transparencyMatrix[x+1][y] == 0 || transparencyMatrix[x-1][y] == 0)) {
                     boundaryMatrix[x][y] = 1;
+                    boundaryImage.setRGB(x, y, 0x000000);
                 } else {
                     boundaryMatrix[x][y] = 0;
+                    boundaryImage.setRGB(x, y, 0xFFFFFF);
                 }
             }
         }
         
         // Compute complete lines from boundary
-        Set<Line> completeLines = new HashSet<Line>();
+        List<Line> completeLines = new ArrayList<Line>();
         //  Right
         for(int y = 1; y < height-1; y++) {
             Line currentLine = null;
@@ -185,7 +194,37 @@ public class ShipDesignData {
         }
         
         // Combine complete lines into polygons
-        
+        this.boundaryPolygons = new HashSet<Polygon>();
+        while(!completeLines.isEmpty()) {
+            Line firstLine = completeLines.remove(0);
+            int startX = firstLine.x1, startY = firstLine.y1;
+            int currentX = firstLine.x2, currentY = firstLine.x2;
+            Polygon polygon = new Polygon();
+            polygon.addPoint(startX, startY);
+            boolean found = true;
+            while((startX != currentX || startY != currentY) && found) {
+                found = false;
+                int i = 0;
+                while(!found && i < completeLines.size()) {
+                    Line testLine = completeLines.get(i);
+                    if(testLine.x1 == currentX && testLine.y1 == currentY) {
+                        completeLines.remove(i);
+                        polygon.addPoint(currentX, currentY);
+                        currentX = testLine.x1;
+                        currentY = testLine.y1;
+                        found = true;
+                    } else if(testLine.x2 == currentX && testLine.y2 == currentY) {
+                        completeLines.remove(i);
+                        polygon.addPoint(currentX, currentY);
+                        currentX = testLine.x2;
+                        currentY = testLine.y2;
+                        found = true;
+                    }
+                    i++;
+                }
+            }
+            this.boundaryPolygons.add(polygon);
+        }
     }
     
     class Line {
@@ -197,5 +236,21 @@ public class ShipDesignData {
             this.x2 = x2;
             this.y2 = y2;
         }
+    }
+    
+    public BufferedImage getShipImage() {
+        return this.shipImage;
+    }
+    
+    public BufferedImage getTransparencyImage() {
+        return this.transparencyImage;
+    }
+    
+    public BufferedImage getBoundaryImage() {
+        return this.boundaryImage;
+    }
+    
+    public Set<Polygon> getBoundaryPolygons() {
+        return this.boundaryPolygons;
     }
 }

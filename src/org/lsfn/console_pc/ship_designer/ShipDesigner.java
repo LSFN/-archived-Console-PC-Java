@@ -3,10 +3,12 @@ package org.lsfn.console_pc.ship_designer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,14 +24,14 @@ public class ShipDesigner implements DataSource, ControlledData {
 
     private Component parent;
     private JFileChooser fileDialog;
-    private BufferedImage shipImage;
+    private ShipDesignData shipDesign;
     
     private int width, height;
     private Rectangle menu, design;
     
     public ShipDesigner(Component parent) {
         this.parent = parent;
-        this.fileDialog = new JFileChooser();
+        this.fileDialog = new JFileChooser(".");
         this.fileDialog.addChoosableFileFilter(new FileFilter() {
             
             @Override
@@ -48,7 +50,7 @@ public class ShipDesigner implements DataSource, ControlledData {
                 }
             }
         });
-        this.shipImage = null;
+        this.shipDesign = null;
         
         this.width = 100;
         this.height = 100;
@@ -88,7 +90,8 @@ public class ShipDesigner implements DataSource, ControlledData {
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 File shipImageFile = this.fileDialog.getSelectedFile();
                 try {
-                    this.shipImage = ImageIO.read(shipImageFile);
+                    BufferedImage shipImage = ImageIO.read(shipImageFile);
+                    this.shipDesign = new ShipDesignData(shipImage);
                 } catch (IOException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -133,18 +136,36 @@ public class ShipDesigner implements DataSource, ControlledData {
         g.fill(bounds);
         g.setColor(Color.BLUE);
         g.fill(menu);
-        if(shipImage != null) {
+        if(this.shipDesign != null) {
+            BufferedImage shipImage = this.shipDesign.getShipImage();
             double scaleX = (double)this.design.width / shipImage.getWidth();
             double scaleY = (double)this.design.height / shipImage.getHeight();
             double scaleToUse = scaleX;
             if(scaleY < scaleX) {
                 scaleToUse = scaleY;
             }
-            double xPos = this.design.getCenterX() - (this.shipImage.getWidth() / 2);
-            double yPos = this.design.getCenterY() - (this.shipImage.getHeight() / 2);
+            double xPos = this.design.getCenterX() - ((scaleToUse * shipImage.getWidth()) / 2);
+            double yPos = this.design.getCenterY() - ((scaleToUse * shipImage.getHeight()) / 2);
             AffineTransform shipImageTransform = AffineTransform.getTranslateInstance(xPos, yPos);
             shipImageTransform.scale(scaleToUse, scaleToUse);
             g.drawImage(shipImage, shipImageTransform, null);
+            //g.drawImage(this.shipDesign.getTransparencyImage(), shipImageTransform, null);
+            //g.drawImage(this.shipDesign.getBoundaryImage(), shipImageTransform, null);
+            
+            
+            g.setColor(Color.WHITE);
+            for(Polygon polygon : this.shipDesign.getBoundaryPolygons()) {
+                PathIterator transformedPath = polygon.getPathIterator(shipImageTransform);
+                Polygon transformedPolygon = new Polygon();
+                double points[] = new double[6];
+                while(!transformedPath.isDone()) {
+                    transformedPath.currentSegment(points);
+                    transformedPolygon.addPoint((int)points[0], (int)points[1]);
+                    transformedPath.next();
+                }
+                g.drawPolygon(transformedPolygon);
+            }
+            
         }
     }
 
