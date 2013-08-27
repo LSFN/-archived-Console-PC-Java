@@ -154,7 +154,9 @@ public class ShipDesigner implements DataSource, ControlledData {
             
             
             g.setColor(Color.WHITE);
-            for(Polygon polygon : this.shipDesign.getBoundaryPolygons()) {
+            
+            //for(Polygon polygon : this.shipDesign.getBoundaryPolygons()) {
+                Polygon polygon = this.shipDesign.getBoundaryPolygon();
                 PathIterator transformedPath = polygon.getPathIterator(shipImageTransform);
                 Polygon transformedPolygon = new Polygon();
                 double points[] = new double[6];
@@ -164,7 +166,7 @@ public class ShipDesigner implements DataSource, ControlledData {
                     transformedPath.next();
                 }
                 g.drawPolygon(transformedPolygon);
-            }
+            //}
             
         }
     }
