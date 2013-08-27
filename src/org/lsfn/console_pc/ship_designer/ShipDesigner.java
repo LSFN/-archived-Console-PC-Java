@@ -28,7 +28,6 @@ public class ShipDesigner implements DataSource, ControlledData {
     
     private int width, height;
     private Rectangle menu, design;
-    private boolean debug;
     
     public ShipDesigner(Component parent) {
         this.parent = parent;
@@ -55,7 +54,6 @@ public class ShipDesigner implements DataSource, ControlledData {
         
         this.width = 100;
         this.height = 100;
-        this.debug = true;
     }
     
     private void reconsiderBounds(Rectangle bounds) {
@@ -69,19 +67,35 @@ public class ShipDesigner implements DataSource, ControlledData {
     
     @Override
     public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
-
+        switch(e.getKeyCode()) {
+        case KeyEvent.VK_Q:
+            this.shipDesign.decreaseGridSize();
+            break;
+        case KeyEvent.VK_E:
+            this.shipDesign.increaseGridSize();
+            break;
+        case KeyEvent.VK_W:
+            this.shipDesign.moveGridUp();
+            break;
+        case KeyEvent.VK_A:
+            this.shipDesign.moveGridLeft();
+            break;
+        case KeyEvent.VK_S:
+            this.shipDesign.moveGridDown();
+            break;
+        case KeyEvent.VK_D:
+            this.shipDesign.moveGridRight();
+            break;
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -104,31 +118,26 @@ public class ShipDesigner implements DataSource, ControlledData {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public Object getData() {
-        // TODO Auto-generated method stub
         return null;
     }
     
@@ -179,11 +188,7 @@ public class ShipDesigner implements DataSource, ControlledData {
                 Rectangle transformedRect = transformedPolygon.getBounds();
                 g.draw(transformedRect);
                 // TODO better logging
-                if(this.debug) {
-                    System.out.println(transformedRect);
-                }
             }
-            this.debug = false;
         }
     }
 

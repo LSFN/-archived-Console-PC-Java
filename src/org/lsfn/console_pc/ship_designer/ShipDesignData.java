@@ -18,20 +18,20 @@ public class ShipDesignData {
     
     public ShipDesignData(BufferedImage shipImage) {
         this.shipImage = shipImage;
-        this.boundaryPolygon = computeHull(shipImage);
+        computeHull();
         this.gridOffsetX = 0;
         this.gridOffsetY = 0;
-        this.gridSize = Math.min(shipImage.getHeight(), shipImage.getWidth()) / 10;
-        this.gridSquares = computeGrid(gridSize, gridOffsetX, gridOffsetY);
+        this.gridSize = Math.min(shipImage.getWidth(), shipImage.getHeight()) / 3;
+        computeGrid();
     }
     
-    private Polygon computeHull(BufferedImage image) {
-        int width = image.getWidth(), height = image.getHeight();
+    private void computeHull() {
+        int width = this.shipImage.getWidth(), height = this.shipImage.getHeight();
         int transparencyMatrix[][] = new int[width][height];
-        WritableRaster alphaRaster = image.getAlphaRaster();
+        WritableRaster alphaRaster = this.shipImage.getAlphaRaster();
         int temp[] = new int[1];
-        for(int x = 0; x < image.getWidth(); x++) {
-            for(int y = 0; y < image.getHeight(); y++) {
+        for(int x = 0; x < this.shipImage.getWidth(); x++) {
+            for(int y = 0; y < this.shipImage.getHeight(); y++) {
                 if(alphaRaster.getPixel(x, y, temp)[0] == 255) {
                     // opaque
                     transparencyMatrix[x][y] = 1;
@@ -118,7 +118,7 @@ public class ShipDesignData {
             x = dirMoveX(x, dir);
             y = dirMoveY(y, dir);
         }
-        return polygon;
+        this.boundaryPolygon = polygon;
     }
     
     private int dirMoveX(int x, int dir) {
@@ -133,22 +133,53 @@ public class ShipDesignData {
         return y;
     }
 
-    private Set<Rectangle> computeGrid(int squareSize, int offsetX, int offsetY) {
-        if(squareSize < lowestPixelsPerMetre) {
-            squareSize = lowestPixelsPerMetre;
-        }
+    private void computeGrid() {
         Set<Rectangle> rectanglesInsideHull = new HashSet<Rectangle>();
-        int horizRects = this.shipImage.getWidth() / squareSize;
-        int vertRects = this.shipImage.getHeight() / squareSize;
+        int horizRects = this.shipImage.getWidth() / this.gridSize;
+        int vertRects = this.shipImage.getHeight() / this.gridSize;
         for(int x = 0; x < horizRects; x++) {
             for(int y = 0; y < vertRects; y++) {
-                Rectangle currentGridSquare = new Rectangle(offsetX + (x * squareSize), offsetY + (y * squareSize), squareSize, squareSize);
+                Rectangle currentGridSquare = new Rectangle(this.gridOffsetX + (x * this.gridSize), gridOffsetY + (y * this.gridSize), this.gridSize, this.gridSize);
                 if(this.boundaryPolygon.contains(currentGridSquare)) {
                     rectanglesInsideHull.add(currentGridSquare);
                 }
             }
         }
-        return rectanglesInsideHull;
+        this.gridSquares = rectanglesInsideHull;
+    }
+    
+    public void increaseGridSize() {
+        if(this.gridSize < Math.min(this.shipImage.getWidth(), this.shipImage.getHeight()) / 3) {
+            this.gridSize++;
+        }
+        computeGrid();
+    }
+    
+    public void decreaseGridSize() {
+        if(this.gridSize > lowestPixelsPerMetre) {
+            this.gridSize--;
+        }
+        computeGrid();
+    }
+    
+    public void moveGridRight() {
+        this.gridOffsetX = (this.gridOffsetX + 1) % this.gridSize;
+        computeGrid();
+    }
+    
+    public void moveGridLeft() {
+        this.gridOffsetX = (this.gridOffsetX + this.gridSize - 1) % this.gridSize;
+        computeGrid();
+    }
+    
+    public void moveGridDown() {
+        this.gridOffsetY = (this.gridOffsetY + 1) % this.gridSize;
+        computeGrid();
+    }
+    
+    public void moveGridUp() {
+        this.gridOffsetY = (this.gridOffsetY + this.gridSize - 1) % this.gridSize;
+        computeGrid();
     }
     
     public BufferedImage getShipImage() {
