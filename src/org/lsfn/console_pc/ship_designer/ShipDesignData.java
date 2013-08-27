@@ -1,17 +1,28 @@
 package org.lsfn.console_pc.ship_designer;
 
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ShipDesignData {
     
+    private static final int lowestPixelsPerMetre = 10;
+    
     private BufferedImage shipImage;
     private Polygon boundaryPolygon;
+    private int gridOffsetX, gridOffsetY, gridSize;
+    private Set<Rectangle> gridSquares;
     
     public ShipDesignData(BufferedImage shipImage) {
         this.shipImage = shipImage;
         this.boundaryPolygon = computeHull(shipImage);
+        this.gridOffsetX = 0;
+        this.gridOffsetY = 0;
+        this.gridSize = Math.min(shipImage.getHeight(), shipImage.getWidth()) / 10;
+        this.gridSquares = computeGrid(gridSize, gridOffsetX, gridOffsetY);
     }
     
     private Polygon computeHull(BufferedImage image) {
@@ -122,11 +133,33 @@ public class ShipDesignData {
         return y;
     }
 
+    private Set<Rectangle> computeGrid(int squareSize, int offsetX, int offsetY) {
+        if(squareSize < lowestPixelsPerMetre) {
+            squareSize = lowestPixelsPerMetre;
+        }
+        Set<Rectangle> rectanglesInsideHull = new HashSet<Rectangle>();
+        int horizRects = this.shipImage.getWidth() / squareSize;
+        int vertRects = this.shipImage.getHeight() / squareSize;
+        for(int x = 0; x < horizRects; x++) {
+            for(int y = 0; y < vertRects; y++) {
+                Rectangle currentGridSquare = new Rectangle(offsetX + (x * squareSize), offsetY + (y * squareSize), squareSize, squareSize);
+                if(this.boundaryPolygon.contains(currentGridSquare)) {
+                    rectanglesInsideHull.add(currentGridSquare);
+                }
+            }
+        }
+        return rectanglesInsideHull;
+    }
+    
     public BufferedImage getShipImage() {
         return this.shipImage;
     }
     
     public Polygon getBoundaryPolygon() {
         return this.boundaryPolygon;
+    }
+    
+    public Set<Rectangle> getGridSquares() {
+        return this.gridSquares;
     }
 }

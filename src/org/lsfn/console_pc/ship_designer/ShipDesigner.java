@@ -28,6 +28,7 @@ public class ShipDesigner implements DataSource, ControlledData {
     
     private int width, height;
     private Rectangle menu, design;
+    private boolean debug;
     
     public ShipDesigner(Component parent) {
         this.parent = parent;
@@ -54,6 +55,7 @@ public class ShipDesigner implements DataSource, ControlledData {
         
         this.width = 100;
         this.height = 100;
+        this.debug = true;
     }
     
     private void reconsiderBounds(Rectangle bounds) {
@@ -137,6 +139,7 @@ public class ShipDesigner implements DataSource, ControlledData {
         g.setColor(Color.BLUE);
         g.fill(menu);
         if(this.shipDesign != null) {
+            // Draw the ship by first determining a transform for where it should be drawn
             BufferedImage shipImage = this.shipDesign.getShipImage();
             double scaleX = (double)this.design.width / shipImage.getWidth();
             double scaleY = (double)this.design.height / shipImage.getHeight();
@@ -149,25 +152,38 @@ public class ShipDesigner implements DataSource, ControlledData {
             AffineTransform shipImageTransform = AffineTransform.getTranslateInstance(xPos, yPos);
             shipImageTransform.scale(scaleToUse, scaleToUse);
             g.drawImage(shipImage, shipImageTransform, null);
-            //g.drawImage(this.shipDesign.getTransparencyImage(), shipImageTransform, null);
-            //g.drawImage(this.shipDesign.getBoundaryImage(), shipImageTransform, null);
             
-            
+            // Draw the ship boundary
             g.setColor(Color.WHITE);
+            Polygon polygon = this.shipDesign.getBoundaryPolygon();
+            PathIterator transformedPath = polygon.getPathIterator(shipImageTransform);
+            Polygon transformedPolygon = new Polygon();
+            double points[] = new double[6];
+            while(!transformedPath.isDone()) {
+                transformedPath.currentSegment(points);
+                transformedPolygon.addPoint((int)points[0], (int)points[1]);
+                transformedPath.next();
+            }
+            g.drawPolygon(transformedPolygon);
             
-            //for(Polygon polygon : this.shipDesign.getBoundaryPolygons()) {
-                Polygon polygon = this.shipDesign.getBoundaryPolygon();
-                PathIterator transformedPath = polygon.getPathIterator(shipImageTransform);
-                Polygon transformedPolygon = new Polygon();
-                double points[] = new double[6];
-                while(!transformedPath.isDone()) {
-                    transformedPath.currentSegment(points);
+            // Draw the grid squares
+            g.setColor(Color.RED);
+            for(Rectangle rect : this.shipDesign.getGridSquares()) {
+                PathIterator transformedRectPath = rect.getPathIterator(shipImageTransform);
+                transformedPolygon = new Polygon();
+                while(!transformedRectPath.isDone()) {
+                    transformedRectPath.currentSegment(points);
                     transformedPolygon.addPoint((int)points[0], (int)points[1]);
-                    transformedPath.next();
+                    transformedRectPath.next();
                 }
-                g.drawPolygon(transformedPolygon);
-            //}
-            
+                Rectangle transformedRect = transformedPolygon.getBounds();
+                g.draw(transformedRect);
+                // TODO better logging
+                if(this.debug) {
+                    System.out.println(transformedRect);
+                }
+            }
+            this.debug = false;
         }
     }
 
