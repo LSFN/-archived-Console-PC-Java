@@ -7,22 +7,30 @@ import java.awt.image.WritableRaster;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.lsfn.console_pc.ship_designer.ShipDesignFile.ShipDesign;
+
 public class ShipDesignData {
     
     private static final int lowestPixelsPerMetre = 10;
     
+    private String shipImageFileName;
     private BufferedImage shipImage;
     private Polygon boundaryPolygon;
     private int gridOffsetX, gridOffsetY, gridSize;
     private Set<Rectangle> gridSquares;
     
-    public ShipDesignData(BufferedImage shipImage) {
+    public ShipDesignData(String shipImageFileName, BufferedImage shipImage) {
+        this.shipImageFileName = shipImageFileName;
         this.shipImage = shipImage;
         computeHull();
         this.gridOffsetX = 0;
         this.gridOffsetY = 0;
         this.gridSize = Math.min(shipImage.getWidth(), shipImage.getHeight()) / 3;
         computeGrid();
+    }
+    
+    public BufferedImage getShipImage() {
+        return this.shipImage;
     }
     
     private void computeHull() {
@@ -133,6 +141,10 @@ public class ShipDesignData {
         return y;
     }
 
+    public Polygon getBoundaryPolygon() {
+        return this.boundaryPolygon;
+    }
+    
     private void computeGrid() {
         Set<Rectangle> rectanglesInsideHull = new HashSet<Rectangle>();
         int horizRects = this.shipImage.getWidth() / this.gridSize;
@@ -182,15 +194,22 @@ public class ShipDesignData {
         computeGrid();
     }
     
-    public BufferedImage getShipImage() {
-        return this.shipImage;
-    }
-    
-    public Polygon getBoundaryPolygon() {
-        return this.boundaryPolygon;
-    }
-    
     public Set<Rectangle> getGridSquares() {
         return this.gridSquares;
+    }
+    
+    public ShipDesign getSerialisedDesign() {
+        ShipDesign.Builder shipDesign = ShipDesign.newBuilder();
+        shipDesign.setShipImageFileName(shipImageFileName);
+        shipDesign.setGridSize(gridSize);
+        shipDesign.setGridOffset(ShipDesign.Point.newBuilder().setX(gridOffsetX).setY(gridOffsetY));
+        ShipDesign.Polygon.Builder shipDesignPolygon = ShipDesign.Polygon.newBuilder();
+        int[] xPoints = this.boundaryPolygon.xpoints;
+        int[] yPoints = this.boundaryPolygon.ypoints;
+        for(int i = 0; i < this.boundaryPolygon.npoints; i++) {
+            shipDesignPolygon.addPoints(ShipDesign.Point.newBuilder().setX(xPoints[i]).setY(yPoints[i]));
+        }
+        shipDesign.setShipBoundary(shipDesignPolygon);
+        return shipDesign.build();
     }
 }

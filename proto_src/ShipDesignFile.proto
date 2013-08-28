@@ -1,0 +1,19 @@
+option java_package = "org.lsfn.console_pc.ship_designer";
+option java_outer_classname = "ShipDesignFile";
+
+message ShipDesign {
+    
+    message Point {
+        required uint32 x = 1;
+        required uint32 y = 2;
+    }
+    
+    message Polygon {
+        repeated Point points = 1;
+    }
+    
+    required string shipImageFileName = 1;
+    required Polygon shipBoundary = 2;
+    required uint32 gridSize = 3;
+    required Point gridOffset = 4; 
+}

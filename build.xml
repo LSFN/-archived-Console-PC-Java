@@ -23,6 +23,7 @@
     		<arg value="--java_out=${src}/" />
     		<arg value="proto_src/STS.proto" />
     		<arg value="proto_src/ScreenFile.proto" />
+    		<arg value="proto_src/ShipDesignFile.proto" />
     	</exec>
 	</target>
 	
