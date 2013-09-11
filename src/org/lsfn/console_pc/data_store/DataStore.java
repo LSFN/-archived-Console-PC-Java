@@ -1,9 +1,11 @@
 package org.lsfn.console_pc.data_store;
 
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
+import org.lsfn.console_pc.data_store.sinks.ISinkDouble;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
 import org.lsfn.console_pc.data_store.sources.ISourceBoolean;
+import org.lsfn.console_pc.data_store.sources.ISourceDouble;
 import org.lsfn.console_pc.data_store.sources.ISourceInteger;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
 
@@ -49,6 +51,11 @@ public class DataStore implements IDataStore {
         }
         return null;
     }
+    
+    @Override
+    public ISourceDouble findSourceDouble(IDataPath dataPath) {
+        return null;
+    }
 
     @Override
     public ISinkBoolean findSinkBoolean(IDataPath dataPath) {
@@ -68,6 +75,11 @@ public class DataStore implements IDataStore {
         if(dataPath.topLevelMatch(starshipConnectionPrefix)) {
             return this.starshipConnectionDataStore.findSinkInteger(dataPath.stripTopLevel());
         }
+        return null;
+    }
+
+    @Override
+    public ISinkDouble findSinkDouble(IDataPath dataPath) {
         return null;
     }
 

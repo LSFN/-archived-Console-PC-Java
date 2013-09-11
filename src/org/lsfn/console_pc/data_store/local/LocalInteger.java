@@ -10,4 +10,14 @@ public class LocalInteger implements ISourceInteger, ISinkInteger {
     public LocalInteger(Integer data) {
         this.data = data;
     }
+
+    @Override
+    public void addTypedDigit(char c) {
+        this.data = (this.data * 10) + ((int)c - (int)'0');
+    }
+
+    @Override
+    public void deleteTypedDigit() {
+        this.data /= 10;
+    }
 }
