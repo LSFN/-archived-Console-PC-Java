@@ -11,52 +11,81 @@ import org.lsfn.console_pc.data_store.IDataStore;
 import org.lsfn.console_pc.data_store.sources.ISourceBoolean;
 import org.lsfn.console_pc.data_store.sources.ISourceDouble;
 import org.lsfn.console_pc.data_store.sources.ISourceInteger;
+import org.lsfn.console_pc.data_store.sources.ISourcePoint;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
+import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 import org.lsfn.console_pc.input.InputEvent;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2.Bindings.Binding.SpecialInput.SpecialInputType;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.Bindings.Binding.SpecialInput.SpecialInputType;
 import org.lsfn.console_pc.widgets.IWidgetPath;
 import org.lsfn.console_pc.widgets.WidgetPath;
 
 public class Binding implements IBinding {
 
     private IWidgetPath lastWidgetClicked;
+    // Mouse inputs
+    private Map<IWidgetPath, ISourceDouble> doubleMouseInputs;
+    private Map<IWidgetPath, ISourceTrigger> mouseTriggerInputs;
+    private Map<IWidgetPath, ISourcePoint> mousePointInputs;
+    // Keyboard inputs (integer represents keycode)
     private Map<IWidgetPath, ISourceString> printableCharacterInputs;
     private Map<IWidgetPath, ISourceInteger> decimalDigitInputs;
     private Map<Integer, ISourceBoolean> keyStateInputs;
-    private Map<IWidgetPath, ISourceDouble> doubleMouseInputs;
+    private Map<Integer, ISourceTrigger> keyTriggerInputs;
     
-    public Binding(ScreenConfig2.Bindings bindings, IDataStore dataStore) {
+    public Binding(ScreenConfig.Bindings bindings, IDataStore dataStore) {
         this.lastWidgetClicked = null;
+        
+        this.doubleMouseInputs = new HashMap<IWidgetPath, ISourceDouble>();
+        this.mouseTriggerInputs = new HashMap<IWidgetPath, ISourceTrigger>();
+        this.mousePointInputs = new HashMap<IWidgetPath, ISourcePoint>();
+
         this.printableCharacterInputs = new HashMap<IWidgetPath, ISourceString>();
         this.decimalDigitInputs = new HashMap<IWidgetPath, ISourceInteger>();
         this.keyStateInputs = new HashMap<Integer, ISourceBoolean>();
-        this.doubleMouseInputs = new HashMap<IWidgetPath, ISourceDouble>();
+        this.keyTriggerInputs = new HashMap<Integer, ISourceTrigger>();
         
-        for(ScreenConfig2.Bindings.Binding binding : bindings.getBindingList()) {
+        for(ScreenConfig.Bindings.Binding binding : bindings.getBindingList()) {
             IDataPath dataPath = new DataPath(binding.getDataPath());
-            ISourceBoolean booleanData = dataStore.findSourceBoolean(dataPath);
-            ISourceString stringData = dataStore.findSourceString(dataPath);
-            ISourceInteger integerData = dataStore.findSourceInteger(dataPath);
-            ISourceDouble doubleData = dataStore.findSourceDouble(dataPath);
-            if(booleanData != null) {
+            ISourceBoolean booleanSource = dataStore.findSourceBoolean(dataPath);
+            ISourceString stringSource = dataStore.findSourceString(dataPath);
+            ISourceInteger integerSource = dataStore.findSourceInteger(dataPath);
+            ISourceDouble doubleSource = dataStore.findSourceDouble(dataPath);
+            ISourceTrigger triggerSource = dataStore.findSourceTrigger(dataPath);
+            ISourcePoint pointSource = dataStore.findSourcePoint(dataPath);
+            
+            if(booleanSource != null) {
                 if(binding.hasKeyboardInput()) {
                     Integer keyVal = getIntegerValueOfKeyEvent(binding.getKeyboardInput().getKeyName());
                     if(keyVal != null) {
-                        this.keyStateInputs.put(keyVal, booleanData);
+                        this.keyStateInputs.put(keyVal, booleanSource);
                     }
                 }
-            } else if(stringData != null) {
+            } else if(stringSource != null) {
                 if(binding.hasSpecialInput() && binding.getSpecialInput().getSpecialInputType() == SpecialInputType.PRINTABLE_CHARACTERS) {
-                    this.printableCharacterInputs.put(WidgetPath.fromString(binding.getSpecialInput().getWidgetPath()), stringData);
+                    this.printableCharacterInputs.put(WidgetPath.fromString(binding.getSpecialInput().getWidgetPath()), stringSource);
                 }
-            } else if(integerData != null) {
+            } else if(integerSource != null) {
                 if(binding.hasSpecialInput() && binding.getSpecialInput().getSpecialInputType() == SpecialInputType.DECIMAL_DIGITS) {
-                    this.decimalDigitInputs.put(WidgetPath.fromString(binding.getSpecialInput().getWidgetPath()), integerData);
+                    this.decimalDigitInputs.put(WidgetPath.fromString(binding.getSpecialInput().getWidgetPath()), integerSource);
                 }
-            } else if(doubleData != null) {
+            } else if(doubleSource != null) {
                 if(binding.hasMouseInput()) {
-                    this.doubleMouseInputs.put(WidgetPath.fromString(binding.getSpecialInput().getWidgetPath()), doubleData);
+                    this.doubleMouseInputs.put(WidgetPath.fromString(binding.getMouseInput().getWidgetPath()), doubleSource);
+                }
+            } else if(triggerSource != null) {
+                if(binding.hasMouseInput()) {
+                    this.mouseTriggerInputs.put(WidgetPath.fromString(binding.getMouseInput().getWidgetPath()), triggerSource);
+                }
+                if(binding.hasKeyboardInput()) {
+                    Integer keyVal = getIntegerValueOfKeyEvent(binding.getKeyboardInput().getKeyName());
+                    if(keyVal != null) {
+                        this.keyTriggerInputs.put(keyVal, triggerSource);
+                    }
+                }
+            } else if(pointSource != null) {
+                if(binding.hasMouseInput()) {
+                    this.mousePointInputs.put(WidgetPath.fromString(binding.getMouseInput().getWidgetPath()), pointSource);
                 }
             }
         }
@@ -111,7 +140,18 @@ public class Binding implements IBinding {
             }
         }
         if(inputEvent.getMouseEvent() != null) {
-            
+            if(inputEvent.getPressedState() && this.doubleMouseInputs.containsKey(this.lastWidgetClicked)) {
+                ISourceDouble sourceDouble = this.doubleMouseInputs.get(this.lastWidgetClicked);
+                sourceDouble.setData(inputEvent.getWidgetInfo().getDoubleData());
+            }
+            if(inputEvent.getPressedState() && this.mousePointInputs.containsKey(this.lastWidgetClicked)) {
+                ISourcePoint sourcePoint = this.mousePointInputs.get(this.lastWidgetClicked);
+                sourcePoint.setData(inputEvent.getWidgetInfo().getPointData());
+            }
+            if(inputEvent.getPressedState() && this.mouseTriggerInputs.containsKey(this.lastWidgetClicked)) {
+                ISourceTrigger sourceTrigger = this.mouseTriggerInputs.get(this.lastWidgetClicked);
+                sourceTrigger.trigger();
+            }
         }
         
     }

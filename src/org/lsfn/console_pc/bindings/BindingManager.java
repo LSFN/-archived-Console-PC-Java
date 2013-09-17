@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.lsfn.console_pc.data_store.IDataStore;
 import org.lsfn.console_pc.input.InputEvent;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
 
 public class BindingManager implements IBindingManager {
 
@@ -27,7 +27,7 @@ public class BindingManager implements IBindingManager {
     }
 
     @Override
-    public void registerBindings(String name, ScreenConfig2.Bindings bindings) {
+    public void registerBindings(String name, ScreenConfig.Bindings bindings) {
         this.bindings.put(name, new Binding(bindings, this.dataStore));
     }
 

@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.swing.JPanel;
 
 import org.lsfn.console_pc.data_store.IDataStore;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2.WidgetLayout.WidgetType;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
 import org.lsfn.console_pc.widgets.IWidget;
 import org.lsfn.console_pc.widgets.RectangularTextWidget;
 
@@ -26,7 +26,7 @@ public class ScreenManager extends JPanel {
         this.dataStore = dataStore;
     }
     
-    public void registerWidgetLayout(String name, ScreenConfig2.WidgetLayout widgetLayout) {
+    public void registerWidgetLayout(String name, ScreenConfig.WidgetLayout widgetLayout) {
         if(widgetLayout.getWidgetType() == WidgetType.RECTANGULAR_TEXT) {
             this.widgetLayouts.put(name, new RectangularTextWidget(widgetLayout, this.dataStore));
         }

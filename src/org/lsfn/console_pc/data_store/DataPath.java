@@ -14,8 +14,8 @@ public class DataPath implements IDataPath {
     }
 
     @Override
-    public boolean topLevelMatch(Object obj) {
-        return !this.pathLevels.isEmpty() && this.pathLevels.peek().equals(obj);
+    public boolean topLevelMatch(String pathNode) {
+        return !this.pathLevels.isEmpty() && this.pathLevels.peek().equals(pathNode);
     }
 
     @Override

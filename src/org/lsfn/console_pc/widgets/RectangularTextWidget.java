@@ -11,8 +11,8 @@ import java.util.List;
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.IDataStore;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2.WidgetLayout.WidgetType;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
 
 public class RectangularTextWidget implements IWidget {
     
@@ -28,7 +28,7 @@ public class RectangularTextWidget implements IWidget {
     
     private Rectangle bounds;
 
-    public RectangularTextWidget(ScreenConfig2.WidgetLayout widgetLayout, IDataStore dataStore) {
+    public RectangularTextWidget(ScreenConfig.WidgetLayout widgetLayout, IDataStore dataStore) {
         this.verticalWidget = widgetLayout.getVertical();
         this.ratio = widgetLayout.getRatio();
         
@@ -39,7 +39,7 @@ public class RectangularTextWidget implements IWidget {
         if(widgetLayout.hasStringDataPath()) this.dataSource = dataStore.findSinkString(new DataPath(widgetLayout.getStringDataPath()));
         
         this.ratioSum = 0;
-        for(ScreenConfig2.WidgetLayout subWidgetLayout : widgetLayout.getWidgetLayoutList()) {
+        for(ScreenConfig.WidgetLayout subWidgetLayout : widgetLayout.getWidgetLayoutList()) {
             if(subWidgetLayout.getWidgetType() == WidgetType.RECTANGULAR_TEXT) {
                 this.subWidgets.add(new RectangularTextWidget(subWidgetLayout, dataStore));
             }

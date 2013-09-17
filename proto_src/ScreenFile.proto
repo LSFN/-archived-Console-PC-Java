@@ -1,31 +1,70 @@
-option java_package = "org.lsfn.console_pc.screen_management";
+option java_package = "org.lsfn.console_pc.screen";
 option java_outer_classname = "ScreenFile";
 
 message ScreenConfig {
 
     message WidgetLayout {
-        required string name = 1;
+        enum WidgetType {
+            RECTANGULAR_TEXT = 0;
+        }
+    
+        required WidgetType widgetType = 1;
         required bool vertical = 2;
         required uint32 ratio = 3;
-        required uint32 spacing = 4;
+        optional string name = 4;
         repeated WidgetLayout widgetLayout = 5;
-        optional string text = 6;
-        optional string colour = 7; // RGB in hex format i.e. RRGGBB e.g. FF00AA
+        
+        // Type specific fields
+        optional string colour = 6; // e.g. "0x000000" for black
+        optional string text = 7;
+        optional string textColour = 8;
+        optional string stringDataPath = 9;
     }
     
-    message OutputLink {
-        required string dataPath = 1;
-        required string widgetPath = 2;
-    }
-    
-    message InputLink {
-        required string dataPath = 1;
-        required string widgetPath = 2;
+    message Bindings {
+        message Binding {
+            message SpecialInput {
+                enum SpecialInputType {
+                    PRINTABLE_CHARACTERS = 0;
+                    DECIMAL_DIGITS = 1;
+                }
+                
+                required SpecialInputType specialInputType = 1;
+                required string widgetPath = 2;
+            }
+            
+            message KeyboardInput {
+                enum KeyState {
+                    PRESSED = 0;
+                    RELEASED = 1;
+                }
+                
+                required KeyState keyState = 1;
+                required string keyName = 2;
+            }
+            
+            message MouseInput {
+                enum MouseState {
+                    PRESSED = 0;
+                    RELEASED = 1;
+                }
+                
+                required MouseState mouseState = 1;
+                required string mouseButton = 2;
+                required string widgetPath = 3;
+            }
+            
+            required string dataPath = 1;
+            optional SpecialInput specialInput = 2;
+            optional KeyboardInput keyboardInput = 3;
+            optional MouseInput mouseInput = 4;
+        }
+        
+        repeated Binding binding = 1; 
     }
     
     required string screenName = 1;
     required WidgetLayout widgetLayout = 2;
-    repeated OutputLink outputLinks = 3;
-    repeated InputLink inputLinks = 4;
+    required Bindings bindings = 3;
     
 }

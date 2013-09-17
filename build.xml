@@ -24,7 +24,6 @@
     		<arg value="proto_src/STS.proto" />
     		<arg value="proto_src/ScreenFile.proto" />
     		<arg value="proto_src/ShipDesignFile.proto" />
-    		<arg value="proto_src/ScreenFile2.proto" />
     	</exec>
 	</target>
 	

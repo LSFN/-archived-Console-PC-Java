@@ -6,8 +6,8 @@ import java.awt.Rectangle;
 import java.util.Map;
 
 import org.lsfn.console_pc.data_store.IDataStore;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2;
-import org.lsfn.console_pc.screen.ScreenFile2.ScreenConfig2.WidgetLayout.WidgetType;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
 
 public class WidgetManager implements IWidgetManager {
 
@@ -35,7 +35,7 @@ public class WidgetManager implements IWidgetManager {
     }
     
     @Override
-    public void registerWidgetLayout(String name, ScreenConfig2.WidgetLayout widgetLayout) {
+    public void registerWidgetLayout(String name, ScreenConfig.WidgetLayout widgetLayout) {
         if(widgetLayout.getWidgetType() == WidgetType.RECTANGULAR_TEXT) {
             this.widgetLayouts.put(name, new RectangularTextWidget(widgetLayout, this.dataStore));
         }

@@ -1,5 +1,10 @@
 package org.lsfn.console_pc.data_store;
 
+import org.lsfn.console_pc.data_store.local.LocalBufferedImage;
+import org.lsfn.console_pc.data_store.local.LocalInteger;
+import org.lsfn.console_pc.data_store.local.LocalListPoint;
+import org.lsfn.console_pc.data_store.local.LocalPolygon;
+import org.lsfn.console_pc.data_store.local.LocalString;
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
 import org.lsfn.console_pc.data_store.sinks.ISinkDouble;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
@@ -17,117 +22,111 @@ import org.lsfn.console_pc.data_store.sources.ISourcePolygon;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
 import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 
-public class DataStore implements IDataStore {
+public class ShipDesignDataStore implements IDataStore {
 
-    private static final int tickInterval = 50;    
-    private static final String starshipConnectionPrefix = "starshipConnection/";
-    private static final String nebulaConnectionPrefix = "nebulaConnection/";
-    private static final String lobbyPrefix = "lobby/";
-    private static final String pilotingPrefix = "piloting/";
-    private static final String visualSensorsPrefix = "visualSensors/";
-    private static final String shipDesignerPrefix = "shipDesigner/";
+    private LocalString shipImageFileName;
+    private LocalBufferedImage shipImage;
+    private LocalInteger gridOffsetX, gridOffsetY, gridSize;
+    private LocalPolygon shipBoundary;
+    private LocalListPoint rightGridLines, downGridLines;
     
-    
-    private StarshipConnectionDataStore starshipConnectionDataStore;
-    //private NebulaConnectionData nebulaConnectionData;
-    //private LobbyData lobbyData;
-    //private PilotingData pilotingData;
-    //private VisualSensorsData visualSensorsData;
-    //private ShipDesignerData shipDesignerData;
-    
-    public DataStore() {
-        this.starshipConnectionDataStore = new StarshipConnectionDataStore();
+    public ShipDesignDataStore() {
+        
     }
     
     @Override
     public ISourceBoolean findSourceBoolean(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISourceString findSourceString(IDataPath dataPath) {
-        if(dataPath.topLevelMatch(starshipConnectionPrefix)) {
-            return this.starshipConnectionDataStore.findSourceString(dataPath.stripTopLevel());
-        }
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISourceInteger findSourceInteger(IDataPath dataPath) {
-        if(dataPath.topLevelMatch(starshipConnectionPrefix)) {
-            return this.starshipConnectionDataStore.findSourceInteger(dataPath.stripTopLevel());
-        }
+        // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public ISourceDouble findSourceDouble(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public ISourceTrigger findSourceTrigger(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISourcePolygon findSourcePolygon(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISourceListPoint findSourceListPoint(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISourcePoint findSourcePoint(IDataPath dataPath) {
-        return null;
-    }
-
-    @Override
-    public ISinkBoolean findSinkBoolean(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
     
     @Override
+    public ISinkBoolean findSinkBoolean(IDataPath dataPath) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public ISinkString findSinkString(IDataPath dataPath) {
-        if(dataPath.topLevelMatch(starshipConnectionPrefix)) {
-            return this.starshipConnectionDataStore.findSinkString(dataPath.stripTopLevel());
-        }
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISinkInteger findSinkInteger(IDataPath dataPath) {
-        if(dataPath.topLevelMatch(starshipConnectionPrefix)) {
-            return this.starshipConnectionDataStore.findSinkInteger(dataPath.stripTopLevel());
-        }
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISinkDouble findSinkDouble(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISinkTrigger findSinkTrigger(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISinkPolygon findSinkPolygon(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISinkListPoint findSinkListPoint(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISinkPoint findSinkPoint(IDataPath dataPath) {
+        // TODO Auto-generated method stub
         return null;
     }
 
