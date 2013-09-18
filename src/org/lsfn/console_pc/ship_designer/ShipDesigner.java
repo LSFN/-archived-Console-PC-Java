@@ -1,12 +1,12 @@
 package org.lsfn.console_pc.ship_designer;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
@@ -17,15 +17,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
-import org.lsfn.console_pc.data_management.elements.ControlledData;
-import org.lsfn.console_pc.data_management.elements.DataSource;
+import org.lsfn.console_pc.ISpecialisedDisplay;
 import org.lsfn.console_pc.ship_designer.ShipDesignFile.ShipDesign;
 
-public class ShipDesigner implements DataSource, ControlledData {
+public class ShipDesigner extends JPanel implements ISpecialisedDisplay {
 
-    private Component parent;
+    private JFrame parent;
     private JFileChooser fileDialog;
     private ShipDesignData shipDesign;
     
@@ -35,8 +36,12 @@ public class ShipDesigner implements DataSource, ControlledData {
     private int width, height;
     private Rectangle menu, menuImportImage, menuSaveShipDesign, design;
     
-    public ShipDesigner(Component parent) {
+    public ShipDesigner(JFrame parent) {
         this.parent = parent;
+        this.parent.add(this);
+        this.parent.pack();
+        this.parent.addKeyListener(this);
+        
         this.fileDialog = new JFileChooser(".");
         this.shipDesign = null;
         
@@ -181,11 +186,6 @@ public class ShipDesigner implements DataSource, ControlledData {
 
     }
 
-    @Override
-    public Object getData() {
-        return null;
-    }
-    
     public void drawDesigner(Graphics2D g, Rectangle bounds) {
         reconsiderBounds(bounds);        
         g.setColor(Color.BLACK);
@@ -238,6 +238,30 @@ public class ShipDesigner implements DataSource, ControlledData {
                 // TODO better logging
             }
         }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void run() {
+        // TODO Auto-generated method stub
+        
     }
 
 }
