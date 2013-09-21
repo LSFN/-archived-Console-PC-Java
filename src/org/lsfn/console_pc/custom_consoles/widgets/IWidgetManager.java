@@ -1,10 +1,10 @@
-package org.lsfn.console_pc.widgets;
+package org.lsfn.console_pc.custom_consoles.widgets;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.WidgetLayout;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig.WidgetLayout;
 
 public interface IWidgetManager {
 

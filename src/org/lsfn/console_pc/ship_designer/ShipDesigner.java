@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -21,10 +22,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
-import org.lsfn.console_pc.ISpecialisedDisplay;
 import org.lsfn.console_pc.ship_designer.ShipDesignFile.ShipDesign;
+import org.lsfn.console_pc.specialised_display.ISpecialisedDisplay;
 
-public class ShipDesigner extends JPanel implements ISpecialisedDisplay {
+public class ShipDesigner implements ISpecialisedDisplay {
 
     private JFrame parent;
     private JFileChooser fileDialog;
@@ -33,14 +34,10 @@ public class ShipDesigner extends JPanel implements ISpecialisedDisplay {
     private FileFilter imageFileFilter;
     private FileFilter shipDesignFileFilter;
     
-    private int width, height;
-    private Rectangle menu, menuImportImage, menuSaveShipDesign, design;
+    private Rectangle bounds, menu, menuImportImage, menuSaveShipDesign, design;
     
-    public ShipDesigner(JFrame parent) {
+    public ShipDesigner(JFrame parent, Rectangle bounds) {
         this.parent = parent;
-        this.parent.add(this);
-        this.parent.pack();
-        this.parent.addKeyListener(this);
         
         this.fileDialog = new JFileChooser(".");
         this.shipDesign = null;
@@ -83,19 +80,7 @@ public class ShipDesigner extends JPanel implements ISpecialisedDisplay {
             }
         };
         
-        this.width = 100;
-        this.height = 100;
-    }
-    
-    private void reconsiderBounds(Rectangle bounds) {
-        if(bounds.width != this.width || bounds.height != this.height) {
-            this.width = bounds.width;
-            this.height = bounds.height;
-            this.menu = new Rectangle(0, 0, (int)(bounds.getWidth()/4), bounds.height);
-            this.menuImportImage = new Rectangle(10, 10, this.menu.width - 20, (this.menu.height / 2) - 20);
-            this.menuSaveShipDesign = new Rectangle(10, (this.menu.height / 2) + 10, this.menu.width - 20, (this.menu.height / 2) - 20);
-            this.design = new Rectangle((int)(bounds.getWidth()/4), 0, (int)(bounds.getWidth() - (bounds.getWidth()/4)), bounds.height);
-        }
+        setBounds(bounds);
     }
     
     @Override
@@ -187,8 +172,35 @@ public class ShipDesigner extends JPanel implements ISpecialisedDisplay {
     }
 
     public void drawDesigner(Graphics2D g, Rectangle bounds) {
-        reconsiderBounds(bounds);        
-        g.setColor(Color.BLACK);
+        
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+	@Override
+	public SpecialisedDisplays nextDisplay() {
+		return SpecialisedDisplays.SHIP_DESIGNER;
+	}
+
+	@Override
+	public void draw(Graphics2D g) {
+		g.setColor(Color.BLACK);
         g.fill(bounds);
         g.setColor(Color.BLUE);
         g.fill(menu);
@@ -238,30 +250,15 @@ public class ShipDesigner extends JPanel implements ISpecialisedDisplay {
                 // TODO better logging
             }
         }
-    }
+	}
 
-    @Override
-    public void mouseDragged(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void run() {
-        // TODO Auto-generated method stub
-        
-    }
+	@Override
+	public void setBounds(Rectangle bounds) {
+		this.bounds = bounds;
+        this.menu = new Rectangle(0, 0, (int)(bounds.width/4), bounds.height);
+        this.menuImportImage = new Rectangle(10, 10, this.menu.width - 20, (this.menu.height / 2) - 20);
+        this.menuSaveShipDesign = new Rectangle(10, (this.menu.height / 2) + 10, this.menu.width - 20, (this.menu.height / 2) - 20);
+        this.design = new Rectangle((int)(bounds.width/4), 0, (int)(bounds.width - (bounds.width/4)), bounds.height);
+	}
 
 }

@@ -20,4 +20,9 @@ public class LocalInteger implements ISourceInteger, ISinkInteger {
     public void deleteTypedDigit() {
         this.data /= 10;
     }
+
+	@Override
+	public Integer getData() {
+		return data;
+	}
 }

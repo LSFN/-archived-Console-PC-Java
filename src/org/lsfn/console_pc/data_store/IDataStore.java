@@ -25,8 +25,6 @@ public interface IDataStore {
     public ISourceInteger findSourceInteger(IDataPath dataPath);
     public ISourceDouble findSourceDouble(IDataPath dataPath);
     public ISourceTrigger findSourceTrigger(IDataPath dataPath);
-    public ISourcePolygon findSourcePolygon(IDataPath dataPath);
-    public ISourceListPoint findSourceListPoint(IDataPath dataPath);
     public ISourcePoint findSourcePoint(IDataPath dataPath);
     
     // Sinks
@@ -35,8 +33,6 @@ public interface IDataStore {
     public ISinkInteger findSinkInteger(IDataPath dataPath);
     public ISinkDouble findSinkDouble(IDataPath dataPath);
     public ISinkTrigger findSinkTrigger(IDataPath dataPath);
-    public ISinkPolygon findSinkPolygon(IDataPath dataPath);
-    public ISinkListPoint findSinkListPoint(IDataPath dataPath);
     public ISinkPoint findSinkPoint(IDataPath dataPath);
     
 }

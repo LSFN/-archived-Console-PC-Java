@@ -1,11 +1,11 @@
-package org.lsfn.console_pc.bindings;
+package org.lsfn.console_pc.custom_consoles.bindings;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lsfn.console_pc.custom_consoles.input.InputEvent;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig;
 import org.lsfn.console_pc.data_store.IDataStore;
-import org.lsfn.console_pc.input.InputEvent;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
 
 public class BindingManager implements IBindingManager {
 

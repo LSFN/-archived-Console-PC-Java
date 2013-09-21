@@ -18,8 +18,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
-import org.lsfn.console_pc.screen.ScreenFile;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig;
 import org.lsfn.console_pc.ship_designer.ShipDesignFile.ShipDesign;
 
 import com.google.protobuf.TextFormat;

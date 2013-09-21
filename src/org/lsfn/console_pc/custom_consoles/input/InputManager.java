@@ -1,13 +1,13 @@
-package org.lsfn.console_pc.input;
+package org.lsfn.console_pc.custom_consoles.input;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import org.lsfn.console_pc.bindings.IBindingManager;
-import org.lsfn.console_pc.widgets.IWidgetInfo;
-import org.lsfn.console_pc.widgets.IWidgetManager;
+import org.lsfn.console_pc.custom_consoles.bindings.IBindingManager;
+import org.lsfn.console_pc.custom_consoles.widgets.IWidgetInfo;
+import org.lsfn.console_pc.custom_consoles.widgets.IWidgetManager;
 
 public class InputManager implements KeyListener, MouseListener {
     

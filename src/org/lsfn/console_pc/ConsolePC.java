@@ -6,7 +6,8 @@ import java.io.InputStreamReader;
 
 import javax.swing.JFrame;
 
-import org.lsfn.console_pc.data_management.DataManager;
+import org.lsfn.console_pc.data_store.DataStore;
+import org.lsfn.console_pc.specialised_display.SpecialisedDisplayManager;
 
 public class ConsolePC extends JFrame {
 
@@ -14,8 +15,11 @@ public class ConsolePC extends JFrame {
      * 
      */
     private static final long serialVersionUID = 5344546375757215850L;
-    private DataManager dataManager;
     private boolean keepGoing;
+    private SpecialisedDisplayManager displayManager;
+    private Thread displayManagerThread;
+    private StarshipConnection starshipConnection;
+    private DataStore dataStore;
     
     public ConsolePC() {
         super();
@@ -26,11 +30,7 @@ public class ConsolePC extends JFrame {
         this.setTitle("LSFN");
         this.setVisible(true);
         this.createBufferStrategy(2);
-        this.dataManager = new DataManager();
-        this.add(this.dataManager.getScreenManager());
-        this.pack();
-        this.addKeyListener(this.dataManager.getInputManager());
-        
+
         this.keepGoing = true;
     }
     
@@ -55,7 +55,11 @@ public class ConsolePC extends JFrame {
     public void run(String[] args) {
         printHelp();
         
-        this.dataManager.start();
+        this.starshipConnection = new StarshipConnection();
+        this.dataStore = new DataStore();
+        this.displayManager = new SpecialisedDisplayManager(this, this.starshipConnection, this.dataStore);
+        this.displayManagerThread = new Thread(this.displayManager);
+        this.displayManagerThread.start();
         
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         while(this.keepGoing) {

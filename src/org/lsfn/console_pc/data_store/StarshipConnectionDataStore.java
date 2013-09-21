@@ -2,20 +2,17 @@ package org.lsfn.console_pc.data_store;
 
 import org.lsfn.console_pc.data_store.local.LocalInteger;
 import org.lsfn.console_pc.data_store.local.LocalString;
+import org.lsfn.console_pc.data_store.local.LocalTrigger;
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
 import org.lsfn.console_pc.data_store.sinks.ISinkDouble;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
-import org.lsfn.console_pc.data_store.sinks.ISinkListPoint;
 import org.lsfn.console_pc.data_store.sinks.ISinkPoint;
-import org.lsfn.console_pc.data_store.sinks.ISinkPolygon;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
 import org.lsfn.console_pc.data_store.sinks.ISinkTrigger;
 import org.lsfn.console_pc.data_store.sources.ISourceBoolean;
 import org.lsfn.console_pc.data_store.sources.ISourceDouble;
 import org.lsfn.console_pc.data_store.sources.ISourceInteger;
-import org.lsfn.console_pc.data_store.sources.ISourceListPoint;
 import org.lsfn.console_pc.data_store.sources.ISourcePoint;
-import org.lsfn.console_pc.data_store.sources.ISourcePolygon;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
 import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 
@@ -23,10 +20,14 @@ public class StarshipConnectionDataStore implements IDataStore {
 
     private LocalString hostname;
     private LocalInteger port;
+    private LocalTrigger connect;
+    private LocalTrigger disconnect;
     
     public StarshipConnectionDataStore() {
         this.hostname = new LocalString("hostname");
         this.port = new LocalInteger(39460);
+        this.connect = new LocalTrigger();
+        this.disconnect = new LocalTrigger();
     }
     
     @Override
@@ -57,16 +58,6 @@ public class StarshipConnectionDataStore implements IDataStore {
 
     @Override
     public ISourceTrigger findSourceTrigger(IDataPath dataPath) {
-        return null;
-    }
-
-    @Override
-    public ISourcePolygon findSourcePolygon(IDataPath dataPath) {
-        return null;
-    }
-
-    @Override
-    public ISourceListPoint findSourceListPoint(IDataPath dataPath) {
         return null;
     }
 
@@ -103,16 +94,11 @@ public class StarshipConnectionDataStore implements IDataStore {
 
     @Override
     public ISinkTrigger findSinkTrigger(IDataPath dataPath) {
-        return null;
-    }
-
-    @Override
-    public ISinkPolygon findSinkPolygon(IDataPath dataPath) {
-        return null;
-    }
-
-    @Override
-    public ISinkListPoint findSinkListPoint(IDataPath dataPath) {
+    	if(dataPath.topLevelMatch("connect")) {
+    		return connect;
+    	} else if(dataPath.topLevelMatch("disconnect")) {
+    		return disconnect;
+    	}
         return null;
     }
 

@@ -1,15 +1,15 @@
-package org.lsfn.console_pc.screen;
+package org.lsfn.console_pc.custom_consoles.screen;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JPanel;
 
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
+import org.lsfn.console_pc.custom_consoles.widgets.IWidget;
+import org.lsfn.console_pc.custom_consoles.widgets.RectangularTextWidget;
 import org.lsfn.console_pc.data_store.IDataStore;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
-import org.lsfn.console_pc.widgets.IWidget;
-import org.lsfn.console_pc.widgets.RectangularTextWidget;
 
 public class ScreenManager extends JPanel {
 

@@ -1,10 +1,15 @@
-package org.lsfn.console_pc.bindings;
+package org.lsfn.console_pc.custom_consoles.bindings;
 
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lsfn.console_pc.custom_consoles.input.InputEvent;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig.Bindings.Binding.SpecialInput.SpecialInputType;
+import org.lsfn.console_pc.custom_consoles.widgets.IWidgetPath;
+import org.lsfn.console_pc.custom_consoles.widgets.WidgetPath;
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.IDataPath;
 import org.lsfn.console_pc.data_store.IDataStore;
@@ -14,11 +19,6 @@ import org.lsfn.console_pc.data_store.sources.ISourceInteger;
 import org.lsfn.console_pc.data_store.sources.ISourcePoint;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
 import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
-import org.lsfn.console_pc.input.InputEvent;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.Bindings.Binding.SpecialInput.SpecialInputType;
-import org.lsfn.console_pc.widgets.IWidgetPath;
-import org.lsfn.console_pc.widgets.WidgetPath;
 
 public class Binding implements IBinding {
 

@@ -1,4 +1,4 @@
-package org.lsfn.console_pc.widgets;
+package org.lsfn.console_pc.custom_consoles.widgets;
 
 import java.awt.Point;
 

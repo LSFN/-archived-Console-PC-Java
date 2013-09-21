@@ -1,4 +1,4 @@
-package org.lsfn.console_pc.widgets;
+package org.lsfn.console_pc.custom_consoles.widgets;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -8,11 +8,11 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig;
+import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.IDataStore;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig;
-import org.lsfn.console_pc.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
 
 public class RectangularTextWidget implements IWidget {
     

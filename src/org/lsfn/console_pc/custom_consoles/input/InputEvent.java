@@ -1,9 +1,9 @@
-package org.lsfn.console_pc.input;
+package org.lsfn.console_pc.custom_consoles.input;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-import org.lsfn.console_pc.widgets.IWidgetInfo;
+import org.lsfn.console_pc.custom_consoles.widgets.IWidgetInfo;
 
 public class InputEvent {
     
