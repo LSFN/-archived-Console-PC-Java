@@ -26,21 +26,19 @@ public class SpecialisedDisplayManager extends JPanel implements Runnable, Hiera
 	private SpecialisedDisplays currentDisplayName;
     private ISpecialisedDisplay currentDisplay;
     private JFrame parent;
-    private StarshipConnection starshipConnection;
     private DataStore dataStore;
     
     private boolean running;
     
 	
-    public SpecialisedDisplayManager(JFrame parent, StarshipConnection starshipConnection, DataStore dataStore) {
-    	this.starshipConnection = starshipConnection;
+    public SpecialisedDisplayManager(JFrame parent, DataStore dataStore) {
     	this.dataStore = dataStore;
     	this.currentDisplayName = SpecialisedDisplays.MENU;
     	
     	this.parent = parent;
     	this.parent.add(this);
     	this.parent.pack();
-    	this.currentDisplay = new Menu(this.starshipConnection, this.dataStore, this.getBounds());
+    	this.currentDisplay = new Menu(this.dataStore, this.getBounds());
     	this.parent.addKeyListener(this.currentDisplay);
     	this.addMouseListener(this.currentDisplay);
     	this.addMouseMotionListener(this.currentDisplay);
@@ -53,13 +51,13 @@ public class SpecialisedDisplayManager extends JPanel implements Runnable, Hiera
     	if(this.currentDisplayName != this.currentDisplay.nextDisplay()) {
     		switch(this.currentDisplay.nextDisplay()) {
     		case MENU:
-    			this.currentDisplay = new Menu(this.starshipConnection, this.dataStore, this.getBounds());
+    			this.currentDisplay = new Menu(this.dataStore, this.getBounds());
     			break;
     		case LOBBY:
-    			this.currentDisplay = new Lobby(this.starshipConnection, this.dataStore, this.getBounds());
+    			this.currentDisplay = new Lobby(this.dataStore, this.getBounds());
     			break;
     		case CONSOLE:
-    			this.currentDisplay = new ConsoleManager(this.starshipConnection, this.dataStore, this.getBounds());
+    			this.currentDisplay = new ConsoleManager(this.dataStore, this.getBounds());
     			break;
     		case SHIP_DESIGNER:
     			this.currentDisplay = new ShipDesigner(this.parent, this.getBounds());

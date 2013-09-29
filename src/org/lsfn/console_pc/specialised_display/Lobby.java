@@ -7,15 +7,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import javax.swing.JFrame;
 
-import org.lsfn.console_pc.StarshipConnection;
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.DataStore;
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
+import org.lsfn.console_pc.data_store.sinks.ISinkStringList;
 import org.lsfn.console_pc.data_store.sources.ISourceInteger;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
 import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
@@ -23,17 +24,19 @@ import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 public class Lobby implements ISpecialisedDisplay {
 
 	private JFrame parent;
-	private StarshipConnection starshipConnection;
 	private DataStore dataStore;
 	private SpecialisedDisplays nextDisplay;
+	
+	private ISourceTrigger starshipDisconnectSource;
+	private ISinkBoolean starshipConnectedSink;
 	
 	private ISourceString nebulaHostnameSource;
 	private ISourceInteger nebulaPortSource;
 	private ISinkString nebulaHostnameSink;
 	private ISinkInteger nebulaPortSink;
 	private ISinkBoolean nebulaConnectedSink;
-	private ISourceTrigger connectNebulaSource;
-	private ISourceTrigger disconnectNebulaSource;
+	private ISourceTrigger nebulaConnectSource;
+	private ISourceTrigger nebulaDisconnectSource;
 	
 	private ISinkString shipNameSink;
 	private ISinkString shipNameEditSink;
@@ -41,6 +44,8 @@ public class Lobby implements ISpecialisedDisplay {
 	private ISourceTrigger shipNameChangeTriggerSource;
 	private ISinkBoolean readySink;
 	private ISourceTrigger readyUpTriggerSource;
+	private ISinkBoolean gameStartedSink;
+	private ISinkStringList shipListSink;
 	
 	private enum SelectedElement {
 		NONE,
@@ -50,20 +55,23 @@ public class Lobby implements ISpecialisedDisplay {
 	}
 	private SelectedElement selectedElement;
 	
-	private Rectangle bounds, disconnectStarshipRect, nebulaHostnameRect, nebulaPortRect, nebulaConnectRect, nebulaBackgroundRect, disconnectNebulaRect,
-			shipNameRect, shipNameButtonRect, readyIndicatorRect, readyButtonRect, shipNameListRect;
+	private Rectangle bounds, disconnectStarshipRect, nebulaHostnameRect, nebulaPortRect, nebulaConnectRect, nebulaBackgroundRect, nebulaDisconnectRect,
+			shipNameEditRect, shipNameRect, shipNameButtonRect, readyIndicatorRect, readyButtonRect, shipNameListRect;
 	
-	public Lobby(StarshipConnection starshipConnection, DataStore dataStore, Rectangle bounds) {
-		this.starshipConnection = starshipConnection;
+	public Lobby(DataStore dataStore, Rectangle bounds) {
 		this.dataStore = dataStore;
 		this.nextDisplay = SpecialisedDisplays.MENU;
+		
+		this.starshipDisconnectSource = dataStore.findSourceTrigger(new DataPath("starshipConnection/disconnect"));
+		this.starshipConnectedSink = dataStore.findSinkBoolean(new DataPath("starshipConnection/connected"));
+		
 		this.nebulaHostnameSource = dataStore.findSourceString(new DataPath("nebulaConnection/hostname"));
 		this.nebulaPortSource = dataStore.findSourceInteger(new DataPath("nebulaConnection/port"));
 		this.nebulaHostnameSink = dataStore.findSinkString(new DataPath("nebulaConnection/hostname"));
 		this.nebulaPortSink = dataStore.findSinkInteger(new DataPath("nebulaConnection/port"));
 		this.nebulaConnectedSink = dataStore.findSinkBoolean(new DataPath("nebulaConnection/connected"));
-		this.connectNebulaSource = dataStore.findSourceTrigger(new DataPath("nebulaConnection/connectNebula"));
-		this.disconnectNebulaSource = dataStore.findSourceTrigger(new DataPath("nebulaConnection/disconnectNebula"));
+		this.nebulaConnectSource = dataStore.findSourceTrigger(new DataPath("nebulaConnection/connectNebula"));
+		this.nebulaDisconnectSource = dataStore.findSourceTrigger(new DataPath("nebulaConnection/disconnectNebula"));
 		
 		this.shipNameSink = dataStore.findSinkString(new DataPath("lobby/recordedShipName"));
 		this.shipNameEditSink = dataStore.findSinkString(new DataPath("lobby/editShipName"));
@@ -71,6 +79,7 @@ public class Lobby implements ISpecialisedDisplay {
 		this.shipNameChangeTriggerSource = dataStore.findSourceTrigger(new DataPath("lobby/changeShipName"));
 		this.readySink = dataStore.findSinkBoolean(new DataPath("lobby/ready"));
 		this.readyUpTriggerSource = dataStore.findSourceTrigger(new DataPath("lobby/readyUp"));
+		this.shipListSink = dataStore.findSinkStringList(new DataPath("lobby/shipList"));
 		setBounds(bounds);
 	}
 
@@ -114,13 +123,16 @@ public class Lobby implements ISpecialisedDisplay {
 	public void mouseClicked(MouseEvent arg0) {
 		if(disconnectStarshipRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NONE;
-			
-		} else if(disconnectNebulaRect.contains(arg0.getPoint())) {
+			this.starshipDisconnectSource.trigger();
+		} else if(nebulaConnectRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NONE;
-			
+			this.nebulaConnectSource.trigger();
+		} else if(nebulaDisconnectRect.contains(arg0.getPoint())) {
+			this.selectedElement = SelectedElement.NONE;
+			this.nebulaDisconnectSource.trigger();
 		} else if(shipNameButtonRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NONE;
-			
+			this.shipNameChangeTriggerSource.trigger();
 		} else if(nebulaHostnameRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NEBULA_HOSTNAME;
 		} else if(nebulaPortRect.contains(arg0.getPoint())) {
@@ -176,13 +188,28 @@ public class Lobby implements ISpecialisedDisplay {
 
 	@Override
 	public SpecialisedDisplays nextDisplay() {
-		// TODO Auto-generated method stub
-		return null;
+		if(!starshipConnectedSink.getData()) {
+			return SpecialisedDisplays.MENU;
+		} else if(gameStartedSink.getData()) {
+			return SpecialisedDisplays.CONSOLE;
+		} else {
+			return SpecialisedDisplays.LOBBY;
+		}
 	}
 
 	private void drawTextInRect(Graphics2D g, String text, Rectangle rect) {
 		Rectangle2D stringRect = g.getFontMetrics().getStringBounds(text, g);
         g.drawString(text, (int)(rect.getCenterX() - stringRect.getWidth()/2), (int)(rect.getCenterY() - stringRect.getHeight()/2));
+	}
+	
+	private void drawTextList(Graphics2D g, List<String> textItems, Rectangle rect) {
+		int y = rect.y;
+		Rectangle2D stringRect = g.getFontMetrics().getStringBounds("Blag", g);
+		int spread = (int)stringRect.getHeight();
+		for(String text : textItems) {
+			g.drawString(text, rect.x, y);
+			y += spread;
+		}
 	}
 	
 	@Override
@@ -197,14 +224,28 @@ public class Lobby implements ISpecialisedDisplay {
 			g.setColor(Color.gray);
 			g.fill(nebulaBackgroundRect);
 			g.setColor(Color.blue);
-			g.fill(disconnectNebulaRect);
+			g.fill(nebulaDisconnectRect);
 			g.fill(shipNameRect);
+			g.fill(shipNameEditRect);
 			g.fill(shipNameButtonRect);
 			g.fill(readyIndicatorRect);
 			g.fill(readyButtonRect);
 			g.fill(shipNameListRect);
 			g.setColor(Color.white);
 			// TODO various texts to be printed here
+			drawTextInRect(g, "Disconnect", nebulaDisconnectRect);
+			drawTextInRect(g, shipNameSink.getData(), shipNameRect);
+			drawTextInRect(g, shipNameEditSink.getData(), shipNameEditRect);
+			drawTextInRect(g, "Change ship name", shipNameButtonRect);
+			drawTextInRect(g, "Ready", readyButtonRect);
+			drawTextList(g, shipListSink.getData(), shipNameListRect);
+			int indicatorSize = Math.min(readyIndicatorRect.width, readyIndicatorRect.height) / 2;
+			if(readySink.getData()) {
+				g.setColor(Color.green);
+			} else {
+				g.setColor(Color.red);
+			}
+			g.fillOval(readyIndicatorRect.x - indicatorSize/2, readyIndicatorRect.y - indicatorSize/2, indicatorSize, indicatorSize);
 		} else {
 			g.setColor(Color.blue);
 			g.fill(nebulaHostnameRect);
@@ -231,12 +272,13 @@ public class Lobby implements ISpecialisedDisplay {
 		int x = nebulaBackgroundRect.x;
 		int y = nebulaBackgroundRect.y;
 		int width = (int)(((nebulaBackgroundRect.width - spacing) / 2.0) - spacing);
-		int height = (int)(((nebulaBackgroundRect.height - spacing) / 5.0) - spacing);
-		disconnectNebulaRect = new Rectangle(x + spacing, y + spacing, width, height);
+		int height = (int)(((nebulaBackgroundRect.height - spacing) / 6.0) - spacing);
+		nebulaDisconnectRect = new Rectangle(x + spacing, y + spacing, width, height);
 		shipNameRect = new Rectangle(x + spacing, y + height + 2*spacing, width, height);
-		shipNameButtonRect = new Rectangle(x + spacing, y + 2*height + 3*spacing, width, height);
-		readyIndicatorRect = new Rectangle(x + spacing, y + 3*height + 4*spacing, width, height);
-		readyButtonRect = new Rectangle(x + spacing, y + 4*height + 5*spacing, width, height);
+		shipNameEditRect = new Rectangle(x + spacing, y + 2*height + 3*spacing, width, height);
+		shipNameButtonRect = new Rectangle(x + spacing, y + 3*height + 4*spacing, width, height);
+		readyIndicatorRect = new Rectangle(x + spacing, y + 4*height + 5*spacing, width, height);
+		readyButtonRect = new Rectangle(x + spacing, y + 5*height + 6*spacing, width, height);
 		shipNameListRect = new Rectangle(x + width + 2*spacing, y + spacing, width, 5*height + 4*spacing);
 	}
 

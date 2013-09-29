@@ -19,15 +19,13 @@ import org.lsfn.console_pc.specialised_display.ISpecialisedDisplay;
 
 public class ConsoleManager implements ISpecialisedDisplay {
 
-    private StarshipConnection starshipConnection;
     private DataStore dataStore;
     private ScreenManager screenManager;
     private WidgetManager widgetManager;
     private BindingManager bindingManager;
     private InputManager inputManager;
     
-    public ConsoleManager(StarshipConnection starshipConnection, DataStore dataStore, Rectangle bounds) {
-        this.starshipConnection = starshipConnection;
+    public ConsoleManager(DataStore dataStore, Rectangle bounds) {
         this.dataStore = dataStore;
         this.screenManager = new ScreenManager(this.dataStore);
         this.widgetManager = new WidgetManager(this.dataStore);

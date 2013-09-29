@@ -18,7 +18,7 @@ public class ConsolePC extends JFrame {
     private boolean keepGoing;
     private SpecialisedDisplayManager displayManager;
     private Thread displayManagerThread;
-    private StarshipConnection starshipConnection;
+    private Synchroniser synchroniser;
     private DataStore dataStore;
     
     public ConsolePC() {
@@ -55,9 +55,9 @@ public class ConsolePC extends JFrame {
     public void run(String[] args) {
         printHelp();
         
-        this.starshipConnection = new StarshipConnection();
         this.dataStore = new DataStore();
-        this.displayManager = new SpecialisedDisplayManager(this, this.starshipConnection, this.dataStore);
+        this.synchroniser = new Synchroniser(dataStore);
+        this.displayManager = new SpecialisedDisplayManager(this, this.dataStore);
         this.displayManagerThread = new Thread(this.displayManager);
         this.displayManagerThread.start();
         

@@ -7,6 +7,7 @@ import org.lsfn.console_pc.data_store.sinks.ISinkDouble;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
 import org.lsfn.console_pc.data_store.sinks.ISinkPoint;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
+import org.lsfn.console_pc.data_store.sinks.ISinkStringList;
 import org.lsfn.console_pc.data_store.sinks.ISinkTrigger;
 import org.lsfn.console_pc.data_store.sources.ISourceBoolean;
 import org.lsfn.console_pc.data_store.sources.ISourceDouble;
@@ -152,6 +153,14 @@ public class DataStore implements IDataStore {
     	}
         return null;
     }
+    
+    @Override
+	public ISinkStringList findSinkStringList(IDataPath dataPath) {
+    	if(dataPath.topLevelMatch(lobbyPrefix)) {
+    		return this.lobbyDataStore.findSinkStringList(dataPath.stripTopLevel());
+    	}
+		return null;
+	}
 
     @Override
     public ISinkInteger findSinkInteger(IDataPath dataPath) {

@@ -9,17 +9,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 
-import org.lsfn.console_pc.StarshipConnection;
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.DataStore;
+import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
 import org.lsfn.console_pc.data_store.sources.ISourceInteger;
 import org.lsfn.console_pc.data_store.sources.ISourceString;
+import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 
 public class Menu implements ISpecialisedDisplay {
 
-	private StarshipConnection starshipConnection;
 	private DataStore dataStore;
 	private SpecialisedDisplays nextDisplay;
 	
@@ -27,6 +27,8 @@ public class Menu implements ISpecialisedDisplay {
 	private ISourceInteger portSource;
 	private ISinkString hostnameSink;
 	private ISinkInteger portSink;
+	private ISourceTrigger connectSource;
+	private ISinkBoolean connectedSink;
 	
 	private enum SelectedElement {
 		NONE,
@@ -37,14 +39,15 @@ public class Menu implements ISpecialisedDisplay {
 	
 	private Rectangle bounds, menuBackgroundRect, hostnameRect, portRect, connectRect, shipDesignerRect, exitRect;
 	
-	public Menu(StarshipConnection starshipConnection, DataStore dataStore, Rectangle bounds) {
-		this.starshipConnection = starshipConnection;
+	public Menu(DataStore dataStore, Rectangle bounds) {
 		this.dataStore = dataStore;
 		this.nextDisplay = SpecialisedDisplays.MENU;
 		this.hostnameSource = this.dataStore.findSourceString(new DataPath("starshipConnection/hostname"));
 		this.portSource = this.dataStore.findSourceInteger(new DataPath("starshipConnection/port"));
 		this.hostnameSink = this.dataStore.findSinkString(new DataPath("starshipConnection/hostname"));
 		this.portSink = this.dataStore.findSinkInteger(new DataPath("starshipConnection/port"));
+		this.connectSource = this.dataStore.findSourceTrigger(new DataPath("starshipConnection/connect"));
+		this.connectedSink = this.dataStore.findSinkBoolean(new DataPath("starshipConnection/connected"));
 		this.selectedElement = SelectedElement.NONE;
 		setBounds(bounds);
 	}
@@ -85,9 +88,7 @@ public class Menu implements ISpecialisedDisplay {
 			this.selectedElement = SelectedElement.PORT;
 		} else if(this.connectRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NONE;
-			if(this.starshipConnection.connect(this.hostnameSink.getData(), this.portSink.getData())) {
-				this.nextDisplay = SpecialisedDisplays.LOBBY;
-			}
+			this.connectSource.trigger();
 		} else if(this.shipDesignerRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NONE;
 			this.nextDisplay = SpecialisedDisplays.SHIP_DESIGNER;
@@ -136,7 +137,11 @@ public class Menu implements ISpecialisedDisplay {
 
 	@Override
 	public SpecialisedDisplays nextDisplay() {
-		return this.nextDisplay;
+		if(this.connectedSink.getData()) {
+			return SpecialisedDisplays.LOBBY;
+		} else {
+			return SpecialisedDisplays.MENU;
+		}
 	}
 
 	private void drawTextWithCentre(Graphics2D g, String text, Point p) {

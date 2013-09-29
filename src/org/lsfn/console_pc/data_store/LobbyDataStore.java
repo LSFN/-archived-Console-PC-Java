@@ -8,9 +8,11 @@ import org.lsfn.console_pc.data_store.sinks.ISinkDouble;
 import org.lsfn.console_pc.data_store.sinks.ISinkInteger;
 import org.lsfn.console_pc.data_store.sinks.ISinkPoint;
 import org.lsfn.console_pc.data_store.sinks.ISinkString;
+import org.lsfn.console_pc.data_store.sinks.ISinkStringList;
 import org.lsfn.console_pc.data_store.sinks.ISinkTrigger;
 import org.lsfn.console_pc.data_store.sinks.SinkBoolean;
 import org.lsfn.console_pc.data_store.sinks.SinkString;
+import org.lsfn.console_pc.data_store.sinks.SinkStringList;
 import org.lsfn.console_pc.data_store.sources.ISourceBoolean;
 import org.lsfn.console_pc.data_store.sources.ISourceDouble;
 import org.lsfn.console_pc.data_store.sources.ISourceInteger;
@@ -26,6 +28,7 @@ public class LobbyDataStore implements IDataStore {
 	private SinkBoolean ready;
 	private LocalTrigger readyUp;
 	private SinkBoolean gameStarted;
+	private SinkStringList shipList;
 	
 	public LobbyDataStore() {
 		this.editShipName = new LocalString("Mungle box");
@@ -34,6 +37,7 @@ public class LobbyDataStore implements IDataStore {
 		this.ready = new SinkBoolean(false);
 		this.readyUp = new LocalTrigger();
 		this.gameStarted = new SinkBoolean(false);
+		this.shipList = new SinkStringList();
 	}
 	
 	public void processInput(STSdown.Lobby lobby) {
@@ -106,6 +110,14 @@ public class LobbyDataStore implements IDataStore {
 		return null;
 	}
 
+	@Override
+	public ISinkStringList findSinkStringList(IDataPath dataPath) {
+		if(dataPath.topLevelMatch("shipList")) {
+			return shipList;
+		}
+		return null;
+	}
+	
 	@Override
 	public ISinkInteger findSinkInteger(IDataPath dataPath) {
 		return null;
