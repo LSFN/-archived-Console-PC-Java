@@ -19,12 +19,12 @@ import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 public class DataStore implements IDataStore {
 
     //private static final int tickInterval = 50;    
-    private static final String starshipConnectionPrefix = "starshipConnection/";
-    private static final String nebulaConnectionPrefix = "nebulaConnection/";
-    private static final String lobbyPrefix = "lobby/";
-    //private static final String pilotingPrefix = "piloting/";
-    //private static final String visualSensorsPrefix = "visualSensors/";
-    //private static final String shipDesignerPrefix = "shipDesigner/";
+    private static final String starshipConnectionPrefix = "starshipConnection";
+    private static final String nebulaConnectionPrefix = "nebulaConnection";
+    private static final String lobbyPrefix = "lobby";
+    //private static final String pilotingPrefix = "piloting";
+    //private static final String visualSensorsPrefix = "visualSensors";
+    //private static final String shipDesignerPrefix = "shipDesigner";
     
     
     private StarshipConnectionDataStore starshipConnectionDataStore;
@@ -37,21 +37,29 @@ public class DataStore implements IDataStore {
     public DataStore() {
         this.starshipConnectionDataStore = new StarshipConnectionDataStore();
         this.nebulaConnectionDataStore = new NebulaConnectionDataStore();
+        this.lobbyDataStore = new LobbyDataStore();
     }
     
     public void processInput(STSdown message) {
     	if(message.hasConnection()) {
     		this.nebulaConnectionDataStore.processInput(message.getConnection());
     	}
+    	if(message.hasLobby()) {
+    		this.lobbyDataStore.processInput(message.getLobby());
+    	}
     }
     
     public STSup generateOutput() {
     	STSup.Connection stsUpConnection = this.nebulaConnectionDataStore.generateOutput();
+    	STSup.Lobby stsUpLobby = this.lobbyDataStore.generateOutput();
     	
-    	if(stsUpConnection != null /* more terms */) {
+    	if(stsUpConnection != null || stsUpLobby != null) {
     		STSup.Builder stsUp = STSup.newBuilder();
     		if(stsUpConnection != null) {
     			stsUp.setConnection(stsUpConnection);
+    		}
+    		if(stsUpLobby != null) {
+    			stsUp.setLobby(stsUpLobby);
     		}
     		return stsUp.build();
     	}

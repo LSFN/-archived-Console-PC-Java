@@ -14,8 +14,7 @@ public class SinkBoolean implements ISinkBoolean {
 	
 	@Override
 	public Boolean getData() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.data;
 	}
 	
 }

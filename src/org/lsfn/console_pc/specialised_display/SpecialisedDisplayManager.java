@@ -1,5 +1,6 @@
 package org.lsfn.console_pc.specialised_display;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.HierarchyBoundsListener;
@@ -63,16 +64,19 @@ public class SpecialisedDisplayManager extends JPanel implements Runnable, Hiera
     			this.currentDisplay = new ShipDesigner(this.parent, this.getBounds());
     			break;
     		case EXIT:
+    			this.running = false;
     			break;
     		}
-    		this.currentDisplayName = this.currentDisplay.nextDisplay();
-    		this.parent.addKeyListener(this.currentDisplay);
-        	this.addMouseListener(this.currentDisplay);
-        	this.addMouseMotionListener(this.currentDisplay);
-        	this.addMouseWheelListener(this.currentDisplay);
+    		if(this.running) {
+	    		this.currentDisplayName = this.currentDisplay.nextDisplay();
+	    		this.parent.addKeyListener(this.currentDisplay);
+	        	this.addMouseListener(this.currentDisplay);
+	        	this.addMouseMotionListener(this.currentDisplay);
+	        	this.addMouseWheelListener(this.currentDisplay);
+    		}
     	}
     }
-    
+
 	@Override
 	public void run() {
 		while(running) {
@@ -99,6 +103,11 @@ public class SpecialisedDisplayManager extends JPanel implements Runnable, Hiera
 	@Override
 	public void ancestorResized(HierarchyEvent e) {
 		this.currentDisplay.setBounds(getBounds());
+	}
+	
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(1024, 768);
 	}
 
 }

@@ -7,8 +7,9 @@ public class DataPath implements IDataPath {
     private Stack<String> pathLevels;
     
     public DataPath(String path) {
+    	this.pathLevels = new Stack<String>();
         String[] split = path.split("/");
-        for(int i = split.length; i > -1 ; i--) {
+        for(int i = split.length-1; i > -1 ; i--) {
             this.pathLevels.push(split[i]);
         }
     }

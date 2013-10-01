@@ -11,6 +11,10 @@ public class SinkStringList implements ISinkStringList {
 		this.data = new ArrayList();
 	}
 	
+	public void setData(List<String> data) {
+		this.data = data;
+	}
+	
 	@Override
 	public List<String> getData() {
 		return this.data;

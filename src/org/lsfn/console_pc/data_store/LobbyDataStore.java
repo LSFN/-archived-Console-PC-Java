@@ -1,6 +1,8 @@
 package org.lsfn.console_pc.data_store;
 
 import org.lsfn.console_pc.STS.STSdown;
+import org.lsfn.console_pc.STS.STSup;
+import org.lsfn.console_pc.STS.STSup.Lobby;
 import org.lsfn.console_pc.data_store.local.LocalString;
 import org.lsfn.console_pc.data_store.local.LocalTrigger;
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
@@ -50,6 +52,25 @@ public class LobbyDataStore implements IDataStore {
 		if(lobby.hasGameStarted()) {
 			this.gameStarted.setData(lobby.getGameStarted());
 		}
+		if(lobby.getShipsInGameCount() > 0) {
+			this.shipList.setData(lobby.getShipsInGameList());
+		}
+	}
+	
+	public Lobby generateOutput() {
+		boolean shipNameUpdate = this.changeShipName.isTriggered();
+		boolean readyUpUpdate = this.readyUp.isTriggered();
+		if(shipNameUpdate || readyUpUpdate) {
+			STSup.Lobby.Builder message = STSup.Lobby.newBuilder();
+			if(readyUpUpdate) {
+				message.setReadyState(!ready.getData());
+			}
+			if(shipNameUpdate) {
+				message.setShipName(editShipName.getData());
+			}
+			return message.build();
+		}
+		return null;
 	}
 	
 	@Override

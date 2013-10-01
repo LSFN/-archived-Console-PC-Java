@@ -20,7 +20,6 @@ import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 
 public class Menu implements ISpecialisedDisplay {
 
-	private DataStore dataStore;
 	private SpecialisedDisplays nextDisplay;
 	
 	private ISourceString hostnameSource;
@@ -40,14 +39,13 @@ public class Menu implements ISpecialisedDisplay {
 	private Rectangle bounds, menuBackgroundRect, hostnameRect, portRect, connectRect, shipDesignerRect, exitRect;
 	
 	public Menu(DataStore dataStore, Rectangle bounds) {
-		this.dataStore = dataStore;
 		this.nextDisplay = SpecialisedDisplays.MENU;
-		this.hostnameSource = this.dataStore.findSourceString(new DataPath("starshipConnection/hostname"));
-		this.portSource = this.dataStore.findSourceInteger(new DataPath("starshipConnection/port"));
-		this.hostnameSink = this.dataStore.findSinkString(new DataPath("starshipConnection/hostname"));
-		this.portSink = this.dataStore.findSinkInteger(new DataPath("starshipConnection/port"));
-		this.connectSource = this.dataStore.findSourceTrigger(new DataPath("starshipConnection/connect"));
-		this.connectedSink = this.dataStore.findSinkBoolean(new DataPath("starshipConnection/connected"));
+		this.hostnameSource = dataStore.findSourceString(new DataPath("starshipConnection/hostname"));
+		this.portSource = dataStore.findSourceInteger(new DataPath("starshipConnection/port"));
+		this.hostnameSink = dataStore.findSinkString(new DataPath("starshipConnection/hostname"));
+		this.portSink = dataStore.findSinkInteger(new DataPath("starshipConnection/port"));
+		this.connectSource = dataStore.findSourceTrigger(new DataPath("starshipConnection/connect"));
+		this.connectedSink = dataStore.findSinkBoolean(new DataPath("starshipConnection/connected"));
 		this.selectedElement = SelectedElement.NONE;
 		setBounds(bounds);
 	}
@@ -138,10 +136,9 @@ public class Menu implements ISpecialisedDisplay {
 	@Override
 	public SpecialisedDisplays nextDisplay() {
 		if(this.connectedSink.getData()) {
-			return SpecialisedDisplays.LOBBY;
-		} else {
-			return SpecialisedDisplays.MENU;
+			this.nextDisplay = SpecialisedDisplays.LOBBY;
 		}
+		return this.nextDisplay;
 	}
 
 	private void drawTextWithCentre(Graphics2D g, String text, Point p) {
@@ -155,15 +152,17 @@ public class Menu implements ISpecialisedDisplay {
 		g.fill(bounds);
 		g.setColor(new Color(0, 0, 128));
 		g.fill(menuBackgroundRect);
-		g.setColor(Color.blue);
+		g.setColor(Color.white);
 		g.fill(hostnameRect);
 		g.fill(portRect);
+		g.setColor(Color.blue);
 		g.fill(connectRect);
 		g.fill(shipDesignerRect);
 		g.fill(exitRect);
-		g.setColor(Color.white);
+		g.setColor(Color.black);
 		drawTextWithCentre(g, this.hostnameSink.getData(), new Point((int)hostnameRect.getCenterX(), (int)hostnameRect.getCenterY()));
 		drawTextWithCentre(g, this.portSink.getData().toString(), new Point((int)portRect.getCenterX(), (int)portRect.getCenterY()));
+		g.setColor(Color.white);
 		drawTextWithCentre(g, "Connect", new Point((int)connectRect.getCenterX(), (int)connectRect.getCenterY()));
 		drawTextWithCentre(g, "Ship Designer", new Point((int)shipDesignerRect.getCenterX(), (int)shipDesignerRect.getCenterY()));
 		drawTextWithCentre(g, "Exit", new Point((int)exitRect.getCenterX(), (int)exitRect.getCenterY()));
@@ -173,17 +172,18 @@ public class Menu implements ISpecialisedDisplay {
 	@Override
 	public void setBounds(Rectangle bounds) {
 		this.bounds = bounds;
-		int width = bounds.width;
-		int height = bounds.height;
-		this.menuBackgroundRect = new Rectangle((int)(width * 2.0 / 5.0), (int)(height / 3.0), (int)(width / 5.0), (int)(height / 3.0));
-		height /= 6.0;
+		int width = (int)(bounds.width/5.0);
+		int height = (int)(bounds.height/3.0);
+		this.menuBackgroundRect = new Rectangle(width * 2, height, width, height);
 		int height2 = (int)(height / 6.0);
-		width -= 10;
-		this.hostnameRect = new Rectangle(this.menuBackgroundRect.x + width/2, this.menuBackgroundRect.height + height2, width, height);
-		this.portRect = new Rectangle(this.menuBackgroundRect.x + width/2, this.menuBackgroundRect.height + height + 2*height2, width, height);
-		this.connectRect = new Rectangle(this.menuBackgroundRect.x + width/2, this.menuBackgroundRect.height + 2*height + 3*height2, width, height);
-		this.shipDesignerRect = new Rectangle(this.menuBackgroundRect.x + width/2, this.menuBackgroundRect.height + 3*height + 4*height2, width, height);
-		this.exitRect = new Rectangle(this.menuBackgroundRect.x + width/2, this.menuBackgroundRect.height + 4*height + 5*height2, width, height);
+		int height3 = (int)(height2 / 6.0);
+		int width2 = (int)(width*9.0 / 10.0);
+		int width3 = (int)(width / 20.0);
+		this.hostnameRect = new Rectangle(this.menuBackgroundRect.x + width3, this.menuBackgroundRect.y + height3, width2, height2);
+		this.portRect = new Rectangle(this.menuBackgroundRect.x + width3, this.menuBackgroundRect.y + height2 + 2*height3, width2, height2);
+		this.connectRect = new Rectangle(this.menuBackgroundRect.x + width3, this.menuBackgroundRect.y + 2*height2 + 3*height3, width2, height2);
+		this.shipDesignerRect = new Rectangle(this.menuBackgroundRect.x + width3, this.menuBackgroundRect.y + 3*height2 + 4*height3, width2, height2);
+		this.exitRect = new Rectangle(this.menuBackgroundRect.x + width3, this.menuBackgroundRect.y + 4*height2 + 5*height3, width2, height2);
 	}
 
 }

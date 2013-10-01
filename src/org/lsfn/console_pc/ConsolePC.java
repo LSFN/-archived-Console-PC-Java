@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 
 import org.lsfn.console_pc.data_store.DataStore;
 import org.lsfn.console_pc.specialised_display.SpecialisedDisplayManager;
+import org.lsfn.console_pc.synchoniser.Synchroniser;
 
 public class ConsolePC extends JFrame {
 
@@ -25,7 +26,7 @@ public class ConsolePC extends JFrame {
         super();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(true);
-        //this.setUndecorated(true);
+        //this.setUndecorated(true); // For fullscreen awesomeness
         this.setSize(WIDTH, HEIGHT);
         this.setTitle("LSFN");
         this.setVisible(true);
@@ -56,7 +57,8 @@ public class ConsolePC extends JFrame {
         printHelp();
         
         this.dataStore = new DataStore();
-        this.synchroniser = new Synchroniser(dataStore);
+        this.synchroniser = new Synchroniser(this.dataStore);
+        this.synchroniser.start();
         this.displayManager = new SpecialisedDisplayManager(this, this.dataStore);
         this.displayManagerThread = new Thread(this.displayManager);
         this.displayManagerThread.start();

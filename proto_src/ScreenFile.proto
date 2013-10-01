@@ -1,4 +1,4 @@
-option java_package = "org.lsfn.console_pc.screen";
+option java_package = "org.lsfn.console_pc.custom_consoles.screen";
 option java_outer_classname = "ScreenFile";
 
 message ScreenConfig {

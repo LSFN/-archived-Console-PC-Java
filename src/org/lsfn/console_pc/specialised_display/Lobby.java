@@ -9,8 +9,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import javax.swing.JFrame;
-
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.DataStore;
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;
@@ -23,10 +21,6 @@ import org.lsfn.console_pc.data_store.sources.ISourceTrigger;
 
 public class Lobby implements ISpecialisedDisplay {
 
-	private JFrame parent;
-	private DataStore dataStore;
-	private SpecialisedDisplays nextDisplay;
-	
 	private ISourceTrigger starshipDisconnectSource;
 	private ISinkBoolean starshipConnectedSink;
 	
@@ -59,9 +53,6 @@ public class Lobby implements ISpecialisedDisplay {
 			shipNameEditRect, shipNameRect, shipNameButtonRect, readyIndicatorRect, readyButtonRect, shipNameListRect;
 	
 	public Lobby(DataStore dataStore, Rectangle bounds) {
-		this.dataStore = dataStore;
-		this.nextDisplay = SpecialisedDisplays.MENU;
-		
 		this.starshipDisconnectSource = dataStore.findSourceTrigger(new DataPath("starshipConnection/disconnect"));
 		this.starshipConnectedSink = dataStore.findSinkBoolean(new DataPath("starshipConnection/connected"));
 		
@@ -80,6 +71,7 @@ public class Lobby implements ISpecialisedDisplay {
 		this.readySink = dataStore.findSinkBoolean(new DataPath("lobby/ready"));
 		this.readyUpTriggerSource = dataStore.findSourceTrigger(new DataPath("lobby/readyUp"));
 		this.shipListSink = dataStore.findSinkStringList(new DataPath("lobby/shipList"));
+		this.gameStartedSink = dataStore.findSinkBoolean(new DataPath("lobby/gameStarted"));
 		setBounds(bounds);
 	}
 
@@ -133,6 +125,9 @@ public class Lobby implements ISpecialisedDisplay {
 		} else if(shipNameButtonRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NONE;
 			this.shipNameChangeTriggerSource.trigger();
+		} else if(readyButtonRect.contains(arg0.getPoint())) {
+			this.selectedElement = SelectedElement.NONE;
+			this.readyUpTriggerSource.trigger();
 		} else if(nebulaHostnameRect.contains(arg0.getPoint())) {
 			this.selectedElement = SelectedElement.NEBULA_HOSTNAME;
 		} else if(nebulaPortRect.contains(arg0.getPoint())) {
@@ -221,40 +216,46 @@ public class Lobby implements ISpecialisedDisplay {
 		g.setColor(Color.white);
 		drawTextInRect(g, "Disconnect from Starship", disconnectStarshipRect);
 		if(this.nebulaConnectedSink.getData()) {
+			// Boxes
 			g.setColor(Color.gray);
 			g.fill(nebulaBackgroundRect);
+			g.setColor(Color.white);
+			g.fill(shipNameEditRect);
 			g.setColor(Color.blue);
 			g.fill(nebulaDisconnectRect);
-			g.fill(shipNameRect);
-			g.fill(shipNameEditRect);
+			g.fill(shipNameRect);			
 			g.fill(shipNameButtonRect);
 			g.fill(readyIndicatorRect);
 			g.fill(readyButtonRect);
 			g.fill(shipNameListRect);
+			// Text
 			g.setColor(Color.white);
-			// TODO various texts to be printed here
 			drawTextInRect(g, "Disconnect", nebulaDisconnectRect);
 			drawTextInRect(g, shipNameSink.getData(), shipNameRect);
-			drawTextInRect(g, shipNameEditSink.getData(), shipNameEditRect);
 			drawTextInRect(g, "Change ship name", shipNameButtonRect);
 			drawTextInRect(g, "Ready", readyButtonRect);
 			drawTextList(g, shipListSink.getData(), shipNameListRect);
+			g.setColor(Color.black);
+			drawTextInRect(g, shipNameEditSink.getData(), shipNameEditRect);
+			// Indicator
 			int indicatorSize = Math.min(readyIndicatorRect.width, readyIndicatorRect.height) / 2;
 			if(readySink.getData()) {
 				g.setColor(Color.green);
 			} else {
 				g.setColor(Color.red);
 			}
-			g.fillOval(readyIndicatorRect.x - indicatorSize/2, readyIndicatorRect.y - indicatorSize/2, indicatorSize, indicatorSize);
+			g.fillOval((int)readyIndicatorRect.getCenterX() - indicatorSize/2, (int)readyIndicatorRect.getCenterY() - indicatorSize/2, indicatorSize, indicatorSize);
 		} else {
-			g.setColor(Color.blue);
+			g.setColor(Color.white);
 			g.fill(nebulaHostnameRect);
 			g.fill(nebulaPortRect);
+			g.setColor(Color.blue);
 			g.fill(nebulaConnectRect);
 			g.setColor(Color.white);
+			drawTextInRect(g, "Connect", nebulaConnectRect);
+			g.setColor(Color.black);
 			drawTextInRect(g, nebulaHostnameSink.getData(), nebulaHostnameRect);
 			drawTextInRect(g, nebulaPortSink.getData().toString(), nebulaPortRect);
-			drawTextInRect(g, "Connect", nebulaConnectRect);
 		}
 	}
 
@@ -279,7 +280,7 @@ public class Lobby implements ISpecialisedDisplay {
 		shipNameButtonRect = new Rectangle(x + spacing, y + 3*height + 4*spacing, width, height);
 		readyIndicatorRect = new Rectangle(x + spacing, y + 4*height + 5*spacing, width, height);
 		readyButtonRect = new Rectangle(x + spacing, y + 5*height + 6*spacing, width, height);
-		shipNameListRect = new Rectangle(x + width + 2*spacing, y + spacing, width, 5*height + 4*spacing);
+		shipNameListRect = new Rectangle(x + width + 2*spacing, y + spacing, width, 6*height + 5*spacing);
 	}
 
 }

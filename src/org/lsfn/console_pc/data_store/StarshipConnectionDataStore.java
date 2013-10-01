@@ -27,7 +27,7 @@ public class StarshipConnectionDataStore implements IDataStore {
     private LocalBoolean connected;
     
     public StarshipConnectionDataStore() {
-        this.hostname = new LocalString("hostname");
+        this.hostname = new LocalString("localhost");
         this.port = new LocalInteger(39460);
         this.connect = new LocalTrigger();
         this.disconnect = new LocalTrigger();

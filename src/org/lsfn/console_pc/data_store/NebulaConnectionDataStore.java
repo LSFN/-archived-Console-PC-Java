@@ -29,7 +29,7 @@ public class NebulaConnectionDataStore implements IDataStore {
 	private LocalTrigger disconnect;
 	
 	public NebulaConnectionDataStore() {
-		this.hostname = new LocalString("hostname");
+		this.hostname = new LocalString("localhost");
 		this.port = new LocalInteger(39461);
 		this.connected = new SinkBoolean(false);
 		this.connect = new LocalTrigger();
@@ -44,13 +44,13 @@ public class NebulaConnectionDataStore implements IDataStore {
 	
 	public STSup.Connection generateOutput() {
 		// The terms in the && statement must go this way round
-		if(connect.isTriggered() && connected.getData()) {
+		if(connect.isTriggered() && !connected.getData()) {
 			STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
 			stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.CONNECT);
 			stsUpConnection.setHost(hostname.getData());
 			stsUpConnection.setPort(port.getData());
 			return stsUpConnection.build();
-		} else if(disconnect.isTriggered() && !connected.getData()) {
+		} else if(disconnect.isTriggered() && connected.getData()) {
 			STSup.Connection.Builder stsUpConnection = STSup.Connection.newBuilder();
 			stsUpConnection.setConnectionCommand(STSup.Connection.ConnectionCommand.DISCONNECT);
 			return stsUpConnection.build();
