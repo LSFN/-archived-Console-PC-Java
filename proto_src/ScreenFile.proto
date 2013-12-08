@@ -39,8 +39,8 @@ message ScreenConfig {
                     RELEASED = 1;
                 }
                 
-                required KeyState keyState = 1;
-                required string keyName = 2;
+                required string keyName = 1;
+                optional KeyState keyState = 2;
             }
             
             message MouseInput {
@@ -49,9 +49,9 @@ message ScreenConfig {
                     RELEASED = 1;
                 }
                 
-                required MouseState mouseState = 1;
-                required string mouseButton = 2;
-                required string widgetPath = 3;
+                required string mouseButton = 1;
+                required string widgetPath = 2;
+                optional MouseState mouseState = 3;
             }
             
             required string dataPath = 1;

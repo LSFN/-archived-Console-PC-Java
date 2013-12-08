@@ -31,4 +31,9 @@ public class BindingManager implements IBindingManager {
         this.bindings.put(name, new Binding(bindings, this.dataStore));
     }
 
+	@Override
+	public void setCurrentBindings(String name) {
+		this.currentBinding = this.bindings.get(name);
+	}
+
 }

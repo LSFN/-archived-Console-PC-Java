@@ -3,15 +3,14 @@ package org.lsfn.console_pc.custom_consoles.screen;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JPanel;
-
+import org.lsfn.console_pc.custom_consoles.bindings.IBinding;
 import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig;
 import org.lsfn.console_pc.custom_consoles.screen.ScreenFile.ScreenConfig.WidgetLayout.WidgetType;
 import org.lsfn.console_pc.custom_consoles.widgets.IWidget;
 import org.lsfn.console_pc.custom_consoles.widgets.RectangularTextWidget;
 import org.lsfn.console_pc.data_store.IDataStore;
 
-public class ScreenManager extends JPanel {
+public class ScreenManager {
 
     /**
      * 
@@ -20,10 +19,15 @@ public class ScreenManager extends JPanel {
     
     private IDataStore dataStore;
     private Map<String, IWidget> widgetLayouts;
+    private Map<String, IBinding> bindings;
 
     public ScreenManager(IDataStore dataStore) {
         this.widgetLayouts = new HashMap<String, IWidget>();
         this.dataStore = dataStore;
+    }
+    
+    private void loadScreens() {
+    	
     }
     
     public void registerWidgetLayout(String name, ScreenConfig.WidgetLayout widgetLayout) {

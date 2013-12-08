@@ -1,4 +1,4 @@
-option java_package = "org.lsfn.console_pc.ship_designer";
+option java_package = "org.lsfn.common";
 option java_outer_classname = "ShipDesignFile";
 
 message ShipDesign {

@@ -41,4 +41,9 @@ public class WidgetManager implements IWidgetManager {
         }
     }
 
+	@Override
+	public void setCurrentWidgetLayout(String name) {
+		this.topLevelWidget = this.widgetLayouts.get(name);
+	}
+
 }

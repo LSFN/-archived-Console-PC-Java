@@ -1,7 +1,7 @@
 package org.lsfn.console_pc.data_store;
 
-import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.STS.STSup;
+import org.lsfn.common.STS.STSdown;
+import org.lsfn.common.STS.STSup;
 import org.lsfn.console_pc.data_store.local.LocalInteger;
 import org.lsfn.console_pc.data_store.local.LocalString;
 import org.lsfn.console_pc.data_store.local.LocalTrigger;

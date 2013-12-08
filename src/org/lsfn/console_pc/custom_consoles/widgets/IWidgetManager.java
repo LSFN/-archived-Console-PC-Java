@@ -12,4 +12,5 @@ public interface IWidgetManager {
     public void drawWidgets(Graphics2D g);
     public IWidgetInfo getWidgetInfoForPoint(Point point);
     public void registerWidgetLayout(String name, WidgetLayout widgetLayout);
+    public void setCurrentWidgetLayout(String name);
 }

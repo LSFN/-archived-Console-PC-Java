@@ -1,9 +1,8 @@
 package org.lsfn.console_pc.synchoniser;
 
-import org.lsfn.console_pc.STS;
+import org.lsfn.common.STS.STSdown;
+import org.lsfn.common.STS.STSup;
 import org.lsfn.console_pc.StarshipConnection;
-import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.STS.STSup;
 import org.lsfn.console_pc.data_store.DataPath;
 import org.lsfn.console_pc.data_store.DataStore;
 import org.lsfn.console_pc.data_store.sinks.ISinkBoolean;

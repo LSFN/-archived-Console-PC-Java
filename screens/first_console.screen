@@ -1,0 +1,94 @@
+screenName: "First Console"
+widgetLayout {
+    widgetType: RECTANGULAR_TEXT
+    vertical: false
+    ratio: 1
+    widgetLayout {
+        widgetType: RECTANGULAR_TEXT
+        vertical: false
+        ratio: 1
+        name: "visual_sensors"
+        colour: "0xFF0000"
+    }
+    widgetLayout {
+        widgetType: RECTANGULAR_TEXT
+        vertical: true
+        ratio: 1
+        name: "reactor"
+        colour: "0x00FF00"
+        widgetLayout {
+            vertical: false
+            ratio: 1
+            colour: "0x00FF00"
+            widgetLayout {
+                widgetType: RECTANGULAR_TEXT
+                vertical: true
+                ratio: 1
+                name: "output"
+                colour: "0x33FF33"
+            }
+            widgetLayout {
+                widgetType: RECTANGULAR_TEXT
+                vertical: true
+                ratio: 1
+                name: "temperature"
+                colour: "0xFF8800"
+            }
+        }
+        widgetLayout {
+            vertical: false
+            ratio: 1
+            widgetLayout {
+                widgetType: RECTANGULAR_TEXT
+                vertical: true
+                ratio: 1
+                name: "reactant"
+                colour: "0xFF3333"
+            }
+            widgetLayout {
+                widgetType: RECTANGULAR_TEXT
+                vertical: true
+                ratio: 1
+                name: "coolant"
+                colour: "0x3333FF"
+            }
+        }
+    }
+    widgetLayout {
+        widgetType: RECTANGULAR_TEXT
+        vertical: true
+        ratio: 1
+        name: "power_distribution"
+        colour: "0x0000FF"
+    }
+}
+Bindings {
+    binding {
+        dataPath: "reactor/reactantIntroduction"
+        mouseInput {
+            mouseButton: "mouse_0"
+            widgetPath: "reactor/reactant"
+        }
+    }
+    binding {
+        dataPath: "reactor/coolantIntroduction"
+        mouseInput {
+            mouseButton: "mouse_0"
+            widgetPath: "reactor/coolant"
+        }
+    }
+    binding {
+        dataPath: "reactor/reactorOutput"
+        mouseInput {
+            mouseButton: "mouse_0"
+            widgetPath: "reactor/output"
+        }
+    }
+    binding {
+        dataPath: "reactor/reactorTemperature"
+        mouseInput {
+            mouseButton: "mouse_0"
+            widgetPath: "reactor/temperature"
+        }
+    }
+}

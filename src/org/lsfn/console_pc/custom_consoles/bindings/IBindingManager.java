@@ -7,4 +7,5 @@ public interface IBindingManager {
 
     public void input(InputEvent inputEvent);
     public void registerBindings(String name, ScreenConfig.Bindings bindings);
+    public void setCurrentBindings(String name);
 }

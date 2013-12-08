@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lsfn.console_pc.STS.STSdown;
-import org.lsfn.console_pc.STS.STSup;
+import org.lsfn.common.STS.STSdown;
+import org.lsfn.common.STS.STSup;
 
 public class StarshipConnection implements Runnable {
 
