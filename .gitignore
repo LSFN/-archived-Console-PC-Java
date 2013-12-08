@@ -11,6 +11,6 @@
 
 # Build directory #
 /build
-/src/org/lsfn/console_pc/STS.java
-/src/org/lsfn/console_pc/screen_management/ScreenFile.java
-/src/org/lsfn/console_pc/ship_designer/ShipDesignFile.java
+/src/org/lsfn/common/STS.java
+/src/org/lsfn/console_pc/generic_display/ScreenFile.java
+/src/org/lsfn/common/ShipDesignFile.java

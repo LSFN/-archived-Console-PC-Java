@@ -7,7 +7,7 @@ import java.awt.image.WritableRaster;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.lsfn.console_pc.ship_designer.ShipDesignFile.ShipDesign;
+import org.lsfn.common.ShipDesignFile.ShipDesign;
 
 public class ShipDesignData {
     

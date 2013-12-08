@@ -22,7 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
-import org.lsfn.console_pc.ship_designer.ShipDesignFile.ShipDesign;
+import org.lsfn.common.ShipDesignFile.ShipDesign;
 import org.lsfn.console_pc.specialised_display.ISpecialisedDisplay;
 
 public class ShipDesigner implements ISpecialisedDisplay {
